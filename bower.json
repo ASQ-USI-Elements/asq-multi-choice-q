@@ -1,0 +1,21 @@
+{
+  "name": "asq-multi-choice",
+  "version": "0.0.0",
+  "homepage": "https://github.com/ASQ-USI/asq-multi-choice",
+  "authors": [
+    "Vasileios Triglianos <triglian@gmail.com>",
+    "Zhenfei Nie <zhenfei.nie@gmail.com>"
+  ],
+  "description": "ASQ Multi-choice question element",
+  "keywords": [
+    "ASQ"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^0.5.1",
+    "polymer": "ASQ_USI/asq-option#^0.0.0"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^2.0.0-rc1"
+  }
+}

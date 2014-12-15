@@ -1,0 +1,58 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../asq-option/asq-option.html">
+<link rel="import" href="../asq-element-conf/asq-element-conf.html">
+
+<polymer-element name="asq-multi-choice">
+  <template>
+    <style>
+    </style>
+
+    <!-- (for now) Keep same when either viewer or presenter -->
+    <div class="asq-multi-choice">
+      <content select="asq-stem"></content>
+      <div id="choices">
+        <ol>
+          <content></content>
+        </ol>
+      </div>
+    </div>
+    
+  </template>
+
+  <script>
+  (function() {
+    var p = {
+      isQuestion_ : true,
+      type_: "asq-multi-choice",
+
+      getSubmission: function() {
+        if ( this.role !== this.Roles.VIEWER ) {
+          return;
+        }
+
+        var options = this.childNodes.array().filter(function(el) {
+          return el.isASQElement && el.type == "asq-option";
+        });
+
+        console.log("options", options);
+        var submisstion = [];
+        options.forEach(function(elem, index) {
+          submisstion.push(elem.getSubmission());
+        });   
+
+        return {
+          questionId: "",
+          timestamp: new Date(),
+          submisstion: submisstion
+        };
+      }
+
+    }
+
+    ASQ.mixin(p, ASQ.ElementType);
+    ASQ.mixin(p, ASQ.Role);
+    Polymer('asq-multi-choice', p);
+
+  })();
+  </script>
+</polymer-element>
