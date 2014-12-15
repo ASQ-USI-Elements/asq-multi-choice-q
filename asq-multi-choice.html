@@ -22,16 +22,14 @@
   <script>
   (function() {
     var p = {
-      isQuestion_ : true,
-      type_: "asq-multi-choice",
 
       getSubmission: function() {
         if ( this.role !== this.Roles.VIEWER ) {
           return;
         }
-
+        console.log(this.childNodes);
         var options = this.childNodes.array().filter(function(el) {
-          return el.isASQElement && el.type == "asq-option";
+          return el.isASQElement && el.nodeName == "ASQ-OPTION";
         });
 
         console.log("options", options);
@@ -49,8 +47,12 @@
 
     }
 
-    ASQ.mixin(p, ASQ.ElementType);
-    ASQ.mixin(p, ASQ.Role);
+    // ASQ.mixin(p, ASQ.ElementType);
+    // ASQ.mixin(p, ASQ.Role);
+    Polymer.mixin2(p, ASQ.ElementTypeMixin);
+    Polymer.mixin2(p, ASQ.RoleMixin);
+    Polymer.mixin2(p, ASQ.QuestionTypeMixin);
+
     Polymer('asq-multi-choice', p);
 
   })();
