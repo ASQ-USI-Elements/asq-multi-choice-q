@@ -47,12 +47,8 @@
 
     }
 
-    // ASQ.mixin(p, ASQ.ElementType);
-    // ASQ.mixin(p, ASQ.Role);
-    ASQ.mixin2(p, ASQ.ElementTypeMixin);
     ASQ.mixin2(p, ASQ.RoleMixin);
-    ASQ.mixin2(p, ASQ.QuestionTypeMixin);
-
+    Polymer.mixin(p, ASQ.ElementTypeMixin, ASQ.QuestionTypeMixin);
     Polymer('asq-multi-choice', p);
 
   })();
