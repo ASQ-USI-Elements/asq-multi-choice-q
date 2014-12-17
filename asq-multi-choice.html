@@ -23,7 +23,7 @@
   (function() {
     var p = {
 
-      getSubmission: function() {
+      submit: function() {
         if ( this.role !== this.Roles.VIEWER ) {
           return;
         }
@@ -35,7 +35,7 @@
         console.log("options", options);
         var submisstion = [];
         options.forEach(function(elem, index) {
-          submisstion.push(elem.getSubmission());
+          submisstion.push(elem.submit());
         });   
 
         return {
