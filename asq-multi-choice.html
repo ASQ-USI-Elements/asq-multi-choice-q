@@ -1,8 +1,9 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-option/asq-option.html">
 <link rel="import" href="../asq-element-common/asq-element-common.html">
 
-<polymer-element name="asq-multi-choice">
+<polymer-element name="asq-multi-choice" attributes="choose">
   <template>
     <style>
     </style>
@@ -12,7 +13,16 @@
       <content select="asq-stem"></content>
       <div id="choices">
         <ol>
-          <content></content>
+        <!-- if choose == 1 we need a paper-radio-group element to group 
+        paper-radio-buttons  -->
+        <template if="{{choose=='1'}}">
+          <paper-radio-group>
+            <content></content>
+          </paper-radio-group>
+        </template>
+        <template if="{{choose!='1'}}">
+            <content></content>
+        </template>
         </ol>
       </div>
     </div>
@@ -22,6 +32,20 @@
   <script>
   (function() {
     var p = {
+      choose: "n",
+
+      ready: function(){
+        //make asq-option elements checkboxes or radio buttons
+        var inputType = (this.choose == '1')
+          ? 'radio'
+          : 'checkbox';
+        console.log(this.choose, inputType)
+        var aos = this.querySelectorAll('asq-option');
+        aos = Array.prototype.slice.call(aos);
+        aos.forEach(function(ao){
+          ao.type = inputType;
+        })
+      },
 
       submit: function() {
         if ( this.role !== this.Roles.VIEWER ) {
