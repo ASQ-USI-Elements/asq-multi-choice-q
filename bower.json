@@ -13,7 +13,9 @@
   "license": "MIT",
   "dependencies": {
     "polymer": "Polymer/polymer#^0.5.1",
+    "asq-base": "ASQ-USI/asq-base#master",
     "asq-option": "ASQ-USI/asq-option#master"
+
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^2.0.0-rc1"

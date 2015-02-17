@@ -1,11 +1,16 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-option/asq-option.html">
-<link rel="import" href="../asq-element-common/asq-element-common.html">
+<link rel="import" href="../asq-base/asq-base.html">
 
 <polymer-element name="asq-multi-choice" attributes="choose">
   <template>
     <style>
+      content[select="asq-option"]::content asq-option{
+        display:block;
+        margin-bottom: 1em;
+        padding:0;
+      }
     </style>
 
     <!-- (for now) Keep same when either viewer or presenter -->
@@ -17,11 +22,11 @@
         paper-radio-buttons  -->
         <template if="{{choose=='1'}}">
           <paper-radio-group>
-            <content></content>
+            <content select="asq-option"></content>
           </paper-radio-group>
         </template>
         <template if="{{choose!='1'}}">
-            <content></content>
+            <content select="asq-option"></content>
         </template>
         </ol>
       </div>
@@ -32,6 +37,7 @@
   <script>
   (function() {
     var p = {
+
       choose: "n",
 
       ready: function(){
@@ -39,7 +45,7 @@
         var inputType = (this.choose == '1')
           ? 'radio'
           : 'checkbox';
-        console.log(this.choose, inputType)
+
         var aos = this.querySelectorAll('asq-option');
         aos = Array.prototype.slice.call(aos);
         aos.forEach(function(ao){
@@ -47,32 +53,78 @@
         })
       },
 
-      submit: function() {
-        if ( this.role !== this.Roles.VIEWER ) {
+      created: function(){
+        document.addEventListener('asq-ready', function(evt){
+          try{
+            this.subscribeToEvents(evt.detail.asqEventBus)
+          }catch(err){
+            console.debug('failed to subscribeToEvents');
+          }
+        }.bind(this));
+      },
+
+      onQuestionType: function(evt){
+        if(evt && evt.questionType && evt.questionType == 'asq-multi-choice'){
+          if(evt.type == "progress"){
+            this.onProgress(evt)
+          }
+        }
+      },
+
+      onProgress: function(evt){
+        if(evt.questionUid !== this.uid) return;
+        if(this.role !== this.roles.PRESENTER) return;
+        this.updateProgress(evt.options, evt.total)
+      },
+
+      updateProgress: function(options, total){
+        total = total | 100;
+        for (var key in options){
+          if(options.hasOwnProperty(key)){
+            this.updateOptionProgress(key, options[key], total);
+          }
+        }
+      },
+
+      updateOptionProgress: function(uid, val, total){
+        var option = document.querySelector('asq-option[uid="'+ uid +'"]');
+        if(! option){
+          console.log('failed to updateOptionProgress, could not find option with uid %s', uid);
           return;
         }
-        console.log(this.childNodes);
+        var progressBar = option.shadowRoot.getElementById('progressBar');
+        progressBar.max = parseInt(total);
+        progressBar.value = parseInt(val);
+      },
+
+      subscribeToEvents: function(eventBus){
+        eventBus.on('asq:question_type', this.onQuestionType.bind(this))
+      },
+
+      submit: function() {
+        if ( this.role !== this.roles.VIEWER ) {
+          return;
+        }
+
         var options = this.childNodes.array().filter(function(el) {
           return el.isASQElement && el.nodeName == "ASQ-OPTION";
         });
 
-        console.log("options", options);
-        var submisstion = [];
+        var submission = [];
         options.forEach(function(elem, index) {
-          submisstion.push(elem.submit());
+          submission.push(elem.submit());
         });   
 
         return {
-          questionId: "",
+          questionUid: this.uid,
           timestamp: new Date(),
-          submisstion: submisstion
+          submission: submission
         };
       }
 
     }
 
-    ASQ.mixin2(p, ASQ.RoleMixin);
-    Polymer.mixin(p, ASQ.ElementTypeMixin, ASQ.QuestionTypeMixin);
+    ASQ.asqify(p, true);
     Polymer('asq-multi-choice', p);
 
   })();
