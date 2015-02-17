@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  <asq-exercise>
+    <asq-multi-choice id="no-options-tag">
+    </asq-multi-choice>   
+    <asq-multi-choice id="no-options">
+      <asq-options>
+      </asq-options>
+    </asq-multi-choice>  
+    <asq-multi-choice id="one-option">
+      <asq-options>
+        <asq-option>Option 1</asq-option>
+      </asq-options>
+    </asq-multi-choice>
+    <asq-multi-choice id="no-uids">
+      <asq-options>
+        <asq-option>Option 1</asq-option>
+        <asq-option>Option 2</asq-option>
+        <asq-option>Option 3</asq-option>
+      </asq-options>
+    </asq-multi-choice>
+    <asq-multi-choice id="uids-ok">
+      <asq-options>
+        <asq-option uid="uid-1">Option 1</asq-option>
+        <asq-option uid="uid-2">Option 2</asq-option>
+        <asq-option uid="uid-3">Option 3</asq-option>
+      </asq-options>
+    </asq-multi-choice>
+    <asq-multi-choice id="same-uids">
+      <asq-options>
+        <asq-option uid="uid-1">Option 1</asq-option>
+        <asq-option uid="uid-1">Option 2</asq-option>
+        <asq-option uid="uid-1">Option 3</asq-option>
+      </asq-options>
+    </asq-multi-choice>   
+    <asq-multi-choice id="correct">
+      <asq-options>
+        <asq-option uid="uid-1">Option 1</asq-option>
+        <asq-option uid="uid-2" correct>Option <em>2</em></asq-option>
+        <asq-option uid="uid-3" correct>Option 3</asq-option>
+      </asq-options>
+    </asq-multi-choice>   
+  </asq-exercise>
+</body>
+</html>
