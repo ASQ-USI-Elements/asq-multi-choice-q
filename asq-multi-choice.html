@@ -3,6 +3,25 @@
 <link rel="import" href="../asq-option/asq-option.html">
 <link rel="import" href="../asq-base/asq-base.html">
 
+<!--
+`asq-multi-choice` is multi-choice question used in ASQ. It can be not only 'multi-choices' but also 'single-choice' by setting the attribute `choose` '1' or 'n'.
+
+##### Example
+    <asq-multi-choice choose="n">
+      <asq-stem><h3>An asq-multi-choice question.</h3></asq-stem>
+      <asq-option name="option-1">Option 1</asq-option>
+      <asq-option name="option-2">Option 2</asq-option>
+      <asq-option name="option-3">Option 3</asq-option>
+      <asq-option name="option-4">Option 4</asq-option>
+    </asq-multi-choice>
+
+In the example above, you can choose any number of answers because the value of `choose` is n.
+
+@element asq-multi-choice
+@group ASQ Elements
+@blurb Element acting as options in multichoice questions.
+@homepage http://github.com/ASQ_USI/asq-multi-choice
+-->
 <polymer-element name="asq-multi-choice" attributes="choose">
   <template>
     <style>
@@ -38,6 +57,13 @@
   (function() {
     var p = {
 
+      /**
+       * This attribute indicates whether this `asq-multi-choice` question is `multi-choices` or `single-choice`.
+       *
+       * @attribute type
+       * @type string
+       * @default 'n'
+       */
       choose: "n",
 
       ready: function(){
@@ -50,7 +76,9 @@
         aos = Array.prototype.slice.call(aos);
         aos.forEach(function(ao){
           ao.type = inputType;
-        })
+        });
+
+        role = this.roles.VIEWER;
       },
 
       created: function(){
@@ -101,6 +129,12 @@
         eventBus.on('asq:question_type', this.onQuestionType.bind(this))
       },
 
+      /**
+         * The `submit` method will submit the answer to a wrapped 'asq-exercise' instance. 
+         * Only useful when the `role` is `viewer`.
+         *
+         * @method submit
+         */
       submit: function() {
         if ( this.role !== this.roles.VIEWER ) {
           return;
