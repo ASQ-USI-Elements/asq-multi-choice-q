@@ -6,7 +6,7 @@ var should = chai.should();
 var expect = chai.expect;
 var cheerio = require('cheerio');
 var Promise = require('bluebird');
-var modulePath = "../lib/asqMcPlugin";
+var modulePath = "../../lib/asqMcPlugin";
 var fs = require("fs");
 
 describe("asqMcPlugin.js", function(){

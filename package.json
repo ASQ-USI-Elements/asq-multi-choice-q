@@ -19,10 +19,11 @@
     "url": "https://github.com/ASQ-USI/asq-multi-choice/issues"
   },
   "dependencies": {
+    "asq-plugin": "ASQ-USI/asq-plugin",
     "bluebird": "^2.8.2",
-    "mongoose": "^3.8.21",
     "cheerio": "^0.18.0",
-    "asq-plugin": "ASQ-USI/asq-plugin"
+    "lodash": "^3.2.0",
+    "mongoose": "^3.8.21"
   },
   "license": "MIT",
   "devDependencies": {
