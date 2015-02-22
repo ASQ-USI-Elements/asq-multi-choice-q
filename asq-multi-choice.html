@@ -123,11 +123,21 @@ In the example above, you can choose any number of answers because the value of 
         }
         var progressBar = option.shadowRoot.getElementById('progressBar');
         progressBar.max = parseInt(total);
-        progressBar.value = parseInt(val);
+        progressBar.value += parseInt(val);
+      },
+
+      onQuestionTypeEdit: function(evt){
+        if(evt && evt.questionType && evt.questionType == 'asq-multi-choice'){
+          if(evt.type == "progress_edit"){
+            console.log("ON SUBMISSION EDITTING BACK", evt);
+            this.onProgress(evt);
+          }
+        }
       },
 
       subscribeToEvents: function(eventBus){
-        eventBus.on('asq:question_type', this.onQuestionType.bind(this))
+        eventBus.on('asq:question_type', this.onQuestionType.bind(this));
+        eventBus.on('asq:question_type_edit', this.onQuestionTypeEdit.bind(this));
       },
 
       /**
