@@ -123,7 +123,7 @@ In the example above, you can choose any number of answers because the value of 
         }
         var progressBar = option.shadowRoot.getElementById('progressBar');
         progressBar.max = parseInt(total);
-        progressBar.value += parseInt(val);
+        progressBar.value = parseInt(val);
       },
 
       onQuestionTypeEdit: function(evt){
@@ -135,6 +135,12 @@ In the example above, you can choose any number of answers because the value of 
         }
       },
 
+      /**
+       * This question type is interested in two events: `asq:question_type`, which is emitted 
+       * when answer is submitted successfully, and `asq:question_type_edit`, which is emitted
+       * when editing answer.
+       *
+       */
       subscribeToEvents: function(eventBus){
         eventBus.on('asq:question_type', this.onQuestionType.bind(this));
         eventBus.on('asq:question_type_edit', this.onQuestionTypeEdit.bind(this));
@@ -142,7 +148,7 @@ In the example above, you can choose any number of answers because the value of 
 
       /**
        * The `submit` method will submit the answer to a wrapped 'asq-exercise' instance. 
-       * Only useful when the `role` is `viewer`.
+       * Only useful when the `role` of the element is <b>viewer</b>.
        *
        * @method submit
        */
