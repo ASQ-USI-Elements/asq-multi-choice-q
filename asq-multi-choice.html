@@ -59,10 +59,10 @@ In the example above, you can choose any number of answers because the value of 
     var p = {
 
       /**
-       * This attribute indicates whether this `asq-multi-choice` question is `multi-choices` or `single-choice`.
+       * This attribute indicates whether this `asq-multi-choice` question can accept one or any number of choices. Possible values are '1' or 'n'
        *
        * @attribute type
-       * @type string
+       * @type "1"|"n"
        * @default 'n'
        */
       choose: "n",
@@ -147,7 +147,13 @@ In the example above, you can choose any number of answers because the value of 
       },
 
       /**
-       * The `submit` method will submit the answer to a wrapped 'asq-exercise' instance. 
+       * The `submit` method returns an object that respresents the submission of this question. The object has the following structure:
+
+           {
+              questionUid: this.uid, 
+              timestamp: new Date(),
+              submission: [] // Array of the result of submit() called for each option of the question
+           }
        * Only useful when the `role` of the element is <b>viewer</b>.
        *
        * @method submit
