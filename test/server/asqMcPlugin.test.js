@@ -41,7 +41,7 @@ describe("asqMcPlugin.js", function(){
     this.asqMcPlugin = require(modulePath);
   });
 
-  describe.skip("parseHtml", function(){
+  describe("parseHtml", function(){
 
     before(function(){
      sinon.stub(this.asqMcPlugin.prototype, "processEl").returns("res");
@@ -93,7 +93,7 @@ describe("asqMcPlugin.js", function(){
 
   });
 
-  describe.skip("processEl", function(){
+  describe("processEl", function(){
 
     before(function(){
      sinon.stub(this.asqMcPlugin.prototype, "parseOptions").returns([]);
@@ -169,21 +169,14 @@ describe("asqMcPlugin.js", function(){
       this.asqmc = new this.asqMcPlugin(this.asq);
     });
 
-    it.skip("should throw an error when there is no `asq-options` tag", function(){
-      
-      var el = this.$("#no-options-tag")[0];
-      var bindedFn = this.asqmc.parseOptions.bind(this.asqmc, this.$, el);
-      expect(bindedFn).to.throw(/should have an asq-options child/);
-    });
-
     it("should throw an error when there less than two `asq-option` tags", function(){
       var el = this.$("#no-options")[0];
       var bindedFn = this.asqmc.parseOptions.bind(this.asqmc, this.$, el);
-      expect(bindedFn).to.throw(/at least two asq-options children/);
+      expect(bindedFn).to.throw(/at least two `asq-option` children/);
 
       el = this.$("#one-option")[0];
       bindedFn = this.asqmc.parseOptions.bind(this.asqmc, this.$, el);
-      expect(bindedFn).to.throw(/at least two asq-options children/);
+      expect(bindedFn).to.throw(/at least two `asq-option` children/);
     });
 
     it("should assign a uid to options that don't have one", function(){
@@ -202,13 +195,13 @@ describe("asqMcPlugin.js", function(){
       this.$(el).find('asq-option').eq(2).attr('uid').should.equal("0123456789abcd0123456783");
     });
 
-    it.skip("should throw an error when there are more than one options with the same uid", function(){
+    it("should throw an error when there are more than one options with the same uid", function(){
       var el = this.$("#same-uids")[0];
       var bindedFn = this.asqmc.parseOptions.bind(this.asqmc, this.$, el);
-      expect(bindedFn).to.throw(/cannot have two options with the same uids/);
+      expect(bindedFn).to.throw(/cannot have two `asq-option` elements with the same uids/);
     });
 
-    it.skip("should parse the `correct` attribute of options", function(){
+    it("should parse the `correct` attribute of options", function(){
       var el = this.$("#correct")[0];
       var result = this.asqmc.parseOptions(this.$, el);
       expect(result[0].correct).to.equal(false);
@@ -216,16 +209,16 @@ describe("asqMcPlugin.js", function(){
       expect(result[2].correct).to.equal(true);
     });
 
-    it.skip("should output the correct data", function(){
+    it("should output the correct data", function(){
       var el = this.$("#correct")[0];
       var result = this.asqmc.parseOptions(this.$, el);
-      expect(result[0]._id).to.equal("uid-1");
+      expect(result[0]._id.toString()).to.equal("0123456789abcd0123456781");
       expect(result[0].html).to.equal("Option 1");
       expect(result[0].correct).to.equal(false);
-      expect(result[1]._id).to.equal("uid-2");
+      expect(result[1]._id.toString()).to.equal("0123456789abcd0123456782");
       expect(result[1].html).to.equal("Option <em>2</em>");
       expect(result[1].correct).to.equal(true);
-      expect(result[2]._id).to.equal("uid-3");
+      expect(result[2]._id.toString()).to.equal("0123456789abcd0123456783");
       expect(result[2].html).to.equal("Option 3");
       expect(result[2].correct).to.equal(true);
     });
