@@ -1,9 +1,8 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-option/asq-option.html">
+<link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-base/asq-base.html">
 
-<!-- TODO ? : add selection for asq-multi-choice -->
 <!--
 `asq-multi-choice` is multi-choice question used in ASQ. It can be not only 'multi-choices' but also 'single-choice' by setting the attribute `choose` '1' or 'n'.
 
@@ -21,23 +20,21 @@ In the example above, you can choose any number of answers because the value of 
 @element asq-multi-choice
 @group ASQ Elements
 @blurb Element acting as options in multichoice questions.
-@homepage http://github.com/ASQ_USI/asq-multi-choice
+@homepage http://github.com/ASQ-USI/asq-multi-choice
 -->
-<polymer-element name="asq-multi-choice" attributes="choose">
+<polymer-element name="asq-multi-choice">
   <template>
     <style>
-      content[select="asq-option"]::content asq-option{
+      content[select="asq-option"]::content asq-option {
         display:block;
         margin-bottom: 1em;
         padding:0;
       }
     </style>
-
-    <!-- (for now) Keep same when either viewer or presenter -->
     <div class="asq-multi-choice">
       <content select="asq-stem"></content>
       <div id="choices">
-        <ol>
+        <ol >
         <!-- if choose == 1 we need a paper-radio-group element to group 
         paper-radio-buttons  -->
         <template if="{{choose=='1'}}">
@@ -58,38 +55,55 @@ In the example above, you can choose any number of answers because the value of 
   (function() {
     var p = {
 
-      /**
-       * This attribute indicates whether this `asq-multi-choice` question can accept one or any number of choices. Possible values are '1' or 'n'
-       *
-       * @attribute type
-       * @type "1"|"n"
-       * @default 'n'
-       */
-      choose: "n",
+      
+      
+      publish: {
+        /**
+         * This attribute indicates whether this `asq-multi-choice` question can accept one or any number of choices. Possible values are '1' or 'n'
+         *
+         * @attribute choose
+         * @type "1"|"n"
+         * @default 'n'
+         */
+        choose: 'n',
 
-      ready: function(){
+        /**
+         * Enable or disable the element. Changes will be also propagated to 
+         * *asq-option*<sub>s</sub>.
+         * 
+         * @attribute disabled
+         * @type boolean
+         */
+        disabled: {value: false, reflect: true}, 
+      },
+      
+
+      chooseChanged: function() {
         //make asq-option elements checkboxes or radio buttons
         var inputType = (this.choose == '1')
           ? 'radio'
           : 'checkbox';
 
-        var aos = this.querySelectorAll('asq-option');
-        aos = Array.prototype.slice.call(aos);
-        aos.forEach(function(ao){
-          ao.type = inputType;
+      
+        this.getOptions().forEach(function(opt){
+          opt.type = inputType;
         });
-
-        role = this.roles.VIEWER;
       },
 
       created: function(){
         document.addEventListener('asq-ready', function(evt){
-          try{
+          try {
             this.subscribeToEvents(evt.detail.asqEventBus)
-          }catch(err){
+          } catch(err){
             console.debug('failed to subscribeToEvents');
           }
         }.bind(this));
+      },
+
+      disabledChanged: function(o, n) {
+        for ( var x of this.getOptions() ) {
+          x.disabled = this.disabled;
+        }
       },
 
       onQuestionType: function(evt){
@@ -152,9 +166,9 @@ In the example above, you can choose any number of answers because the value of 
            {
               questionUid: this.uid, 
               timestamp: new Date(),
-              submission: [] // Array of the result of submit() called for each option of the question
+              submission: [] 
            }
-       * Only useful when the `role` of the element is <b>viewer</b>.
+       * Only enabled when the `role` of the element is <b>viewer</b>.
        *
        * @method submit
        */
@@ -163,9 +177,7 @@ In the example above, you can choose any number of answers because the value of 
           return;
         }
 
-        var options = this.childNodes.array().filter(function(el) {
-          return el.isASQElement && el.nodeName == "ASQ-OPTION";
-        });
+        var options = this.getOptions();
 
         var submission = [];
         options.forEach(function(elem, index) {
@@ -177,8 +189,13 @@ In the example above, you can choose any number of answers because the value of 
           timestamp: new Date(),
           submission: submission
         };
-      }
+      },
 
+      getOptions: function() {
+        return this.childNodes.array().filter(function(el) {
+          return el.isASQElement && el.nodeName == "ASQ-OPTION";
+        });
+      }
     }
 
     ASQ.asqify(p, true);
