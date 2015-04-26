@@ -35,42 +35,44 @@
 
 <template is="auto-binding">
 
+  <style>
+    asq-multi-choice {
+      margin-bottom: 1em;
+    }
+  </style>
+
   <section>
 
     <asq-multi-choice>
       <asq-stem><h3>An asq-multi-choice question where you can choose any number of answers.</h3></asq-stem>
-      <asq-option name="option-1">Option 1</asq-option>
-      <asq-option name="option-2">Option 2</asq-option>
-      <asq-option name="option-3">Option 3</asq-option>
-      <asq-option name="option-4">Option 4</asq-option>
+      <asq-option checked>Option 1</asq-option>
+      <asq-option>Option 2</asq-option>
+      <asq-option>Option 3</asq-option>
+      <asq-option>Option 4</asq-option>
     </asq-multi-choice>
 
     <asq-multi-choice disabled>
       <asq-stem><h3>A disabled asq-multi-choice question</h3></asq-stem>
-      <asq-option name="option-1">Option 1</asq-option>
-      <asq-option name="option-2">Option 2</asq-option>
-      <asq-option name="option-3">Option 3</asq-option>
-      <asq-option name="option-4">Option 4</asq-option>
+      <asq-option>Option 1</asq-option>
+      <asq-option>Option 2</asq-option>
+      <asq-option checked>Option 3</asq-option>
+      <asq-option>Option 4</asq-option>
     </asq-multi-choice>
-
-    <br>
 
     <asq-multi-choice choose="1">
       <asq-stem><h3>Here you can pick just one answer:</h3></asq-stem>
-      <asq-option name="option-1">Option 1</asq-option>
-      <asq-option name="option-2">Option 2</asq-option>
-      <asq-option name="option-3">Option 3</asq-option>
-      <asq-option name="option-4">Option 4</asq-option>
+      <asq-option>Option 1</asq-option>
+      <asq-option checked>Option 2</asq-option>
+      <asq-option>Option 3</asq-option>
+      <asq-option>Option 4</asq-option>
     </asq-multi-choice>
-
-    <br>
 
     <asq-multi-choice role="presenter">
       <asq-stem><h3>An asq-multi-choice question from the presenter's view</h3></asq-stem>
-      <asq-option name="option-1">Option 1</asq-option>
-      <asq-option name="option-2">Option 2</asq-option>
-      <asq-option name="option-3">Option 3</asq-option>
-      <asq-option name="option-4">Option 4</asq-option>
+      <asq-option>Option 1</asq-option>
+      <asq-option>Option 2</asq-option>
+      <asq-option>Option 3</asq-option>
+      <asq-option>Option 4</asq-option>
     </asq-multi-choice>
 
 
