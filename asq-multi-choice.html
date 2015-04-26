@@ -4,7 +4,9 @@
 <link rel="import" href="../asq-base/asq-base.html">
 
 <!--
-`asq-multi-choice` is multi-choice question used in ASQ. It can be not only 'multi-choices' but also 'single-choice' by setting the attribute `choose` '1' or 'n'.
+`asq-multi-choice` is always contains many options which is able to be selected.
+It is possible to select many options or only one option by setting the 
+attribute `choose` to '1' or 'n'.
 
 ##### Example
     <asq-multi-choice choose="n">
@@ -15,7 +17,16 @@
       <asq-option name="option-4">Option 4</asq-option>
     </asq-multi-choice>
 
-In the example above, you can choose any number of answers because the value of `choose` is n.
+
+
+    <asq-multi-choice choose="1">
+      <asq-stem><h3>Here you can pick just one answer:</h3></asq-stem>
+      <asq-option name="option-1">Option 1</asq-option>
+      <asq-option name="option-2">Option 2</asq-option>
+      <asq-option name="option-3">Option 3</asq-option>
+      <asq-option name="option-4">Option 4</asq-option>
+    </asq-multi-choice>
+
 
 @element asq-multi-choice
 @group ASQ Elements
@@ -76,6 +87,13 @@ In the example above, you can choose any number of answers because the value of 
          */
         disabled: {value: false, reflect: true}, 
       },
+
+      domReady: function() {
+        // call disabledChanged manually because only after the dom is ready, 
+        // it is possible to propagate the value to children nodes
+        // 
+        this.disabledChanged();
+      },
       
 
       chooseChanged: function() {
@@ -100,7 +118,7 @@ In the example above, you can choose any number of answers because the value of 
         }.bind(this));
       },
 
-      disabledChanged: function(o, n) {
+      disabledChanged: function() {
         for ( var x of this.getOptions() ) {
           x.disabled = this.disabled;
         }
@@ -191,6 +209,12 @@ In the example above, you can choose any number of answers because the value of 
         };
       },
 
+      /**
+       * Return all the *asq-option* elements.
+       *
+       * @method getOptions
+       * @return array all the *asq-option* elements
+       */
       getOptions: function() {
         return this.childNodes.array().filter(function(el) {
           return el.isASQElement && el.nodeName == "ASQ-OPTION";
