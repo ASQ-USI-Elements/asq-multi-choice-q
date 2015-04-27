@@ -43,43 +43,44 @@
 
   <section>
 
-    <asq-multi-choice>
-      <asq-stem><h3>An asq-multi-choice question where you can choose any number of answers.</h3></asq-stem>
-      <asq-option checked>Option 1</asq-option>
-      <asq-option>Option 2</asq-option>
-      <asq-option>Option 3</asq-option>
-      <asq-option>Option 4</asq-option>
-    </asq-multi-choice>
-
-    <asq-multi-choice disabled>
-      <asq-stem><h3>A disabled asq-multi-choice question</h3></asq-stem>
-      <asq-option>Option 1</asq-option>
-      <asq-option>Option 2</asq-option>
-      <asq-option checked>Option 3</asq-option>
-      <asq-option>Option 4</asq-option>
-    </asq-multi-choice>
-
-    <asq-multi-choice choose="1">
+    <asq-multi-choice selected="op1">
       <asq-stem><h3>Here you can pick just one answer:</h3></asq-stem>
-      <asq-option>Option 1</asq-option>
-      <asq-option checked>Option 2</asq-option>
-      <asq-option>Option 3</asq-option>
-      <asq-option>Option 4</asq-option>
+      <asq-option name="op0">Option 0</asq-option>
+      <asq-option name="op1">Option 1</asq-option>
+      <asq-option name="op2">Option 2</asq-option>
+      <asq-option name="op3">Option 3</asq-option>
+    </asq-multi-choice>
+
+    <asq-multi-choice multi>
+      <asq-stem><h3>An asq-multi-choice question where you can choose any number of answers.</h3></asq-stem>
+      <asq-option name="op0" >Option 0</asq-option>
+      <asq-option name="op1" selected>Option 1</asq-option>
+      <asq-option name="op2" selected>Option 2</asq-option>
+      <asq-option name="op3" >Option 3</asq-option>
+    </asq-multi-choice>
+
+    <asq-multi-choice multi disabled>
+      <asq-stem><h3>A disabled one.</h3></asq-stem>
+      <asq-option name="op0">Option 0</asq-option>
+      <asq-option name="op1">Option 1</asq-option>
+      <asq-option name="op2">Option 2</asq-option>
+      <asq-option name="op3">Option 3</asq-option>
     </asq-multi-choice>
 
     <asq-multi-choice role="presenter">
       <asq-stem><h3>An asq-multi-choice question from the presenter's view</h3></asq-stem>
-      <asq-option>Option 1</asq-option>
-      <asq-option>Option 2</asq-option>
-      <asq-option>Option 3</asq-option>
-      <asq-option>Option 4</asq-option>
+      <asq-option name="op0">Option 0</asq-option>
+      <asq-option name="op1">Option 1</asq-option>
+      <asq-option name="op2">Option 2</asq-option>
+      <asq-option name="op3">Option 3</asq-option>
     </asq-multi-choice>
-
-
 
   </section>
 
   <script>
+  var x = document.querySelector('asq-multi-choice');
+  
+
   window.onmessage = function(e){
     if (typeof e.data.role == "string" && e.data.role.length > 0) {
       var allAsqElements = document.querySelectorAll('html /deep/ *');

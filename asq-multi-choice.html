@@ -1,30 +1,30 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../asq-option/asq-option.html">
+<link rel="import" href="../core-selector/core-selector.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-base/asq-base.html">
 
 <!--
 `asq-multi-choice` is always contains many options which is able to be selected.
 It is possible to select many options or only one option by setting the 
-attribute `choose` to '1' or 'n'.
+attribute `multi` to true or false.
 
 ##### Example
-    <asq-multi-choice choose="n">
-      <asq-stem><h3>An asq-multi-choice question.</h3></asq-stem>
-      <asq-option name="option-1">Option 1</asq-option>
-      <asq-option name="option-2">Option 2</asq-option>
-      <asq-option name="option-3">Option 3</asq-option>
-      <asq-option name="option-4">Option 4</asq-option>
+    <asq-multi-choice multi>
+      <asq-stem><h3>You can choose any number of options</h3></asq-stem>
+      <asq-option name="op0" selected>Option 1</asq-option>
+      <asq-option name="op1"         >Option 2</asq-option>
+      <asq-option name="op2"         >Option 3</asq-option>
+      <asq-option name="op3" selected>Option 4</asq-option>
     </asq-multi-choice>
 
 
-
-    <asq-multi-choice choose="1">
-      <asq-stem><h3>Here you can pick just one answer:</h3></asq-stem>
-      <asq-option name="option-1">Option 1</asq-option>
-      <asq-option name="option-2">Option 2</asq-option>
-      <asq-option name="option-3">Option 3</asq-option>
-      <asq-option name="option-4">Option 4</asq-option>
+    <asq-multi-choice selected="3">
+      <asq-stem><h3>Here you can pick just one option</h3></asq-stem>
+      <asq-option name="op0">Option 1</asq-option>
+      <asq-option name="op1">Option 2</asq-option>
+      <asq-option name="op2">Option 3</asq-option>
+      <asq-option name="op3">Option 4</asq-option>
     </asq-multi-choice>
 
 
@@ -33,72 +33,44 @@ attribute `choose` to '1' or 'n'.
 @blurb Element acting as options in multichoice questions.
 @homepage http://github.com/ASQ-USI/asq-multi-choice
 -->
-<polymer-element name="asq-multi-choice">
+<polymer-element name="asq-multi-choice" extends="core-selector">
   <template>
     <style>
-      content[select="asq-option"]::content asq-option {
-        display:block;
-        margin-bottom: 1em;
-        padding:0;
+      :host {
+        display: block;
       }
+
+
     </style>
-    <div class="asq-multi-choice">
-      <content select="asq-stem"></content>
-      <div id="choices">
-        <ol >
-        <!-- if choose == 1 we need a paper-radio-group element to group 
-        paper-radio-buttons  -->
-        <template if="{{choose=='1'}}">
-          <paper-radio-group>
-            <content select="asq-option"></content>
-          </paper-radio-group>
-        </template>
-        <template if="{{choose!='1'}}">
-            <content select="asq-option"></content>
-        </template>
-        </ol>
-      </div>
-    </div>
-    
+
+    <content select="asq-stem"></content>
+
+    <ol>
+      <shadow></shadow>
+    </ol>
+
+
   </template>
 
   <script>
   (function() {
     var p = {
 
-      
-      
       publish: {
         /**
-         * This attribute indicates whether this `asq-multi-choice` question can accept one or any number of choices. Possible values are '1' or 'n'
-         *
-         * @attribute choose
-         * @type "1"|"n"
-         * @default 'n'
-         */
-        choose: 'n',
-
-        /**
-         * Enable or disable the element. Changes will be also propagated to 
-         * *asq-option*<sub>s</sub>.
+         * Disable or endable this elements.
          * 
          * @attribute disabled
          * @type boolean
+         * @default false
          */
         disabled: {value: false, reflect: true}, 
       },
 
-      domReady: function() {
-        // call disabledChanged manually because only after the dom is ready, 
-        // it is possible to propagate the value to children nodes
-        // 
-        this.disabledChanged();
-      },
-      
-
-      chooseChanged: function() {
+      multiChanged: function() {
+        // console.log('multiChanged');
         //make asq-option elements checkboxes or radio buttons
-        var inputType = (this.choose == '1')
+        var inputType = ! this.multi
           ? 'radio'
           : 'checkbox';
 
@@ -108,6 +80,41 @@ attribute `choose` to '1' or 'n'.
         });
       },
 
+      disabledChanged: function() {
+        for ( var x of this.getOptions() ) {
+          x.disabled = this.disabled;
+        }
+      },
+
+
+      /**
+       * Return all the *asq-option* elements.
+       *
+       * @method getOptions
+       * @return array all the *asq-option* elements
+       */
+      getOptions: function() {
+        return this.childNodes.array().filter(function(el) {
+          return el.isASQElement && el.nodeName == "ASQ-OPTION";
+        });
+      },
+
+      /**
+       * If true, this question becomes multi-choices quesiton.
+       * 
+       * @attribute multi
+       * @type boolean
+       * @default false
+       */
+      multi: false,
+
+      selectedAttribute: 'checked',
+
+      activateEvent: 'asq-change',
+
+      defaultExcludedLocalNames: 'asq-stem',
+
+      //
       created: function(){
         document.addEventListener('asq-ready', function(evt){
           try {
@@ -116,12 +123,6 @@ attribute `choose` to '1' or 'n'.
             console.debug('failed to subscribeToEvents');
           }
         }.bind(this));
-      },
-
-      disabledChanged: function() {
-        for ( var x of this.getOptions() ) {
-          x.disabled = this.disabled;
-        }
       },
 
       onQuestionType: function(evt){
@@ -209,17 +210,6 @@ attribute `choose` to '1' or 'n'.
         };
       },
 
-      /**
-       * Return all the *asq-option* elements.
-       *
-       * @method getOptions
-       * @return array all the *asq-option* elements
-       */
-      getOptions: function() {
-        return this.childNodes.array().filter(function(el) {
-          return el.isASQElement && el.nodeName == "ASQ-OPTION";
-        });
-      }
     }
 
     ASQ.asqify(p, true);
