@@ -140,7 +140,7 @@ attribute `multi` to true or false.
       },
 
       updateProgress: function(options, total){
-        total = total | 100;
+        total = total || 100;
         for (var key in options){
           if(options.hasOwnProperty(key)){
             this.updateOptionProgress(key, options[key], total);
