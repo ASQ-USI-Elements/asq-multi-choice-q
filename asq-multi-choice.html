@@ -126,21 +126,61 @@ attribute `multi` to true or false.
       },
 
       onQuestionType: function(evt){
-        if(evt && evt.questionType && evt.questionType == 'asq-multi-choice'){
+        if(!evt || ! evt.questionType) return;
+
+        if(evt.questionType == 'asq-multi-choice'){
           if(evt.type == "progress"){
-            this.onProgress(evt)
+            this.onProgress(evt.question);
+          }else if(evt.type == "restorePresenter"){
+            if(this.role !== this.roles.PRESENTER) return;
+            this.onRestorePresenter(evt);
+          }
+          else if(evt.type == "restoreViewer"){
+            if(this.role !== this.roles.VIEWER) return;
+            this.onRestoreViewer(evt);
           }
         }
       },
 
-      onProgress: function(evt){
-        if(evt.questionUid !== this.uid) return;
+      onRestorePresenter: function(evt){
+        evt.questions.forEach(function(q){
+          if(q.uid != this.uid) return;
+          var optionsDictionary = {};
+          q.data.options.forEach(function(option){
+            optionsDictionary[option.uid] = option.sum;
+          }.bind(this));
+          this.updateProgress(optionsDictionary, evt.total)
+        }.bind(this));
+      },
+
+      onRestoreViewer: function(evt){
+        evt.questions.forEach(function(q){
+          console.log(q)
+         if(q.uid != this.uid) return;
+          q.options.forEach(function(option){
+           this.updateOption(option._id, option.value);
+          }.bind(this));
+        }.bind(this));
+      },
+
+      updateOption: function(uid, val){
+        var opt = this.querySelector('asq-option[uid="' + uid + '"');
+        if(! opt){
+          console.log("Could not find option with uid %s", uid);
+          return;
+        }
+
+        opt.checked = val;
+      },
+
+      onProgress: function(question){
+        if(question.uid !== this.uid) return;
         if(this.role !== this.roles.PRESENTER) return;
-        this.updateProgress(evt.options, evt.total)
+        this.updateProgress(question.options, question.total)
       },
 
       updateProgress: function(options, total){
-        total = total | 100;
+        total = total || 100;
         for (var key in options){
           if(options.hasOwnProperty(key)){
             this.updateOptionProgress(key, options[key], total);
@@ -157,6 +197,9 @@ attribute `multi` to true or false.
         var progressBar = option.shadowRoot.getElementById('progressBar');
         progressBar.max = parseInt(total);
         progressBar.value = parseInt(val);
+
+        var progressNum = option.shadowRoot.getElementById('progressNum');
+        progressNum.innerHTML = progressBar.value;
       },
 
       onQuestionTypeEdit: function(evt){
