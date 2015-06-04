@@ -17,6 +17,7 @@
     "asq-option": "ASQ-USI/asq-option#master"
 
   },
+  "ignore": [ "index.js", "lib", "package.json", "node_modules", ".npmignore", "test/server"],
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^2.0.0-rc1"
   }
