@@ -202,24 +202,13 @@ attribute `multi` to true or false.
         progressNum.innerHTML = progressBar.value;
       },
 
-      onQuestionTypeEdit: function(evt){
-        if(evt && evt.questionType && evt.questionType == 'asq-multi-choice'){
-          if(evt.type == "progress_edit"){
-            console.log("ON SUBMISSION EDITTING BACK", evt);
-            this.onProgress(evt);
-          }
-        }
-      },
-
       /**
        * This question type is interested in two events: `asq:question_type`, which is emitted 
-       * when answer is submitted successfully, and `asq:question_type_edit`, which is emitted
-       * when editing answer.
+       * when answer is submitted successfully.
        *
        */
       subscribeToEvents: function(eventBus){
         eventBus.on('asq:question_type', this.onQuestionType.bind(this));
-        eventBus.on('asq:question_type_edit', this.onQuestionTypeEdit.bind(this));
       },
 
       /**
