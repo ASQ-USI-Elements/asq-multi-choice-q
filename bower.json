@@ -1,10 +1,10 @@
 {
-  "name": "asq-multi-choice",
+  "name": "asq-multi-choice-q",
   "version": "0.0.1",
-  "homepage": "https://github.com/ASQ-USI/asq-multi-choice",
+  "homepage": "https://github.com/ASQ-USI-Elements/asq-multi-choice-q",
   "authors": [
     "Vasileios Triglianos <triglian@gmail.com>",
-    "Zhenfei Nie <zhenfei.nie@gmail.com>"
+    "Zhenfei Nie <youyis2fox@gmail.com>"
   ],
   "description": "ASQ Multi-choice question element",
   "keywords": [

@@ -3,11 +3,11 @@
 <head>
   <meta name="asq-elements" content="width=device-width, initial-scale=1, user-scalable=no">
 
-  <title>ASQ-Multi-Choice | Demo</title>
+  <title>asq-multi-choice-q | Demo</title>
 
-  <script src="..//webcomponentsjs/webcomponents.js"></script>
+  <script src="../webcomponentsjs/webcomponents.js"></script>
 
-  <link href="asq-multi-choice.html" rel="import">
+  <link href="asq-multi-choice-q.html" rel="import">
   <link href="../asq-stem/asq-stem.html" rel="import">
   <link href="../asq-option/asq-option.html" rel="import">
 
@@ -36,49 +36,49 @@
 <template is="auto-binding">
 
   <style>
-    asq-multi-choice {
+    asq-multi-choice-q {
       margin-bottom: 1em;
     }
   </style>
 
   <section>
 
-    <asq-multi-choice selected="op1">
+    <asq-multi-choice-q selected="op1">
       <asq-stem><h3>Here you can pick just one answer:</h3></asq-stem>
       <asq-option name="op0">Option 0</asq-option>
       <asq-option name="op1">Option 1</asq-option>
       <asq-option name="op2">Option 2</asq-option>
       <asq-option name="op3">Option 3</asq-option>
-    </asq-multi-choice>
+    </asq-multi-choice-q>
 
-    <asq-multi-choice multi>
-      <asq-stem><h3>An asq-multi-choice question where you can choose any number of answers.</h3></asq-stem>
+    <asq-multi-choice-q multi>
+      <asq-stem><h3>An asq-multi-choice-q question where you can choose any number of answers.</h3></asq-stem>
       <asq-option name="op0" >Option 0</asq-option>
       <asq-option name="op1" selected>Option 1</asq-option>
       <asq-option name="op2" selected>Option 2</asq-option>
       <asq-option name="op3" >Option 3</asq-option>
-    </asq-multi-choice>
+    </asq-multi-choice-q>
 
-    <asq-multi-choice multi disabled>
+    <asq-multi-choice-q multi disabled>
       <asq-stem><h3>A disabled one.</h3></asq-stem>
       <asq-option name="op0">Option 0</asq-option>
       <asq-option name="op1">Option 1</asq-option>
       <asq-option name="op2">Option 2</asq-option>
       <asq-option name="op3">Option 3</asq-option>
-    </asq-multi-choice>
+    </asq-multi-choice-q>
 
-<!--     <asq-multi-choice role="presenter">
-      <asq-stem><h3>An asq-multi-choice question from the presenter's view</h3></asq-stem>
+<!--     <asq-multi-choice-q role="presenter">
+      <asq-stem><h3>An asq-multi-choice-q question from the presenter's view</h3></asq-stem>
       <asq-option name="op0">Option 0</asq-option>
       <asq-option name="op1">Option 1</asq-option>
       <asq-option name="op2">Option 2</asq-option>
       <asq-option name="op3">Option 3</asq-option>
-    </asq-multi-choice> -->
+    </asq-multi-choice-q> -->
 
   </section>
 
   <script>
-  var x = document.querySelector('asq-multi-choice');
+  var x = document.querySelector('asq-multi-choice-q');
   
 
   window.onmessage = function(e){

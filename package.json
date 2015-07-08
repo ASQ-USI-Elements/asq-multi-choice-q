@@ -1,22 +1,22 @@
 {
-  "name": "asq-multi-choice",
+  "name": "asq-multi-choice-q",
   "version": "0.0.0",
   "description": "Multi-choice question type for ASQ.",
   "author": "Zhenfei Nie <zhen.fei.nie@usi.ch>, Vassilis Triglianos <triglian@gmail.com>",
-  "homepage": "https://github.com/ASQ-USI/asq-multi-choice",
+  "homepage": "https://github.com/ASQ-USI-Elements/asq-multi-choice-q",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:ASQ-USI/asq-multi-choice.git"
+    "url": "git@github.com:ASQ-USI-Elements/asq-multi-choice-q.git"
   },
   "keywords": [
     "node.js"
   ],
   "bugs": {
-    "url": "https://github.com/ASQ-USI/asq-multi-choice/issues"
+    "url": "https://github.com/ASQ-USI-Elements/asq-multi-choice-q/issues"
   },
   "dependencies": {
     "bluebird": "^2.8.2",

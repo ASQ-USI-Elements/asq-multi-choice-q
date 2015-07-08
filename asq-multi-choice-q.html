@@ -5,35 +5,35 @@
 <link rel="import" href="../asq-base/asq-base.html">
 
 <!--
-`asq-multi-choice` is always contains many options which is able to be selected.
+`asq-multi-choice-q` is always contains many options which is able to be selected.
 It is possible to select many options or only one option by setting the 
 attribute `multi` to true or false.
 
 ##### Example
-    <asq-multi-choice multi>
+    <asq-multi-choice-q multi>
       <asq-stem><h3>You can choose any number of options</h3></asq-stem>
       <asq-option name="op0" selected>Option 1</asq-option>
       <asq-option name="op1"         >Option 2</asq-option>
       <asq-option name="op2"         >Option 3</asq-option>
       <asq-option name="op3" selected>Option 4</asq-option>
-    </asq-multi-choice>
+    </asq-multi-choice-q>
 
 
-    <asq-multi-choice selected="3">
+    <asq-multi-choice-q selected="3">
       <asq-stem><h3>Here you can pick just one option</h3></asq-stem>
       <asq-option name="op0">Option 1</asq-option>
       <asq-option name="op1">Option 2</asq-option>
       <asq-option name="op2">Option 3</asq-option>
       <asq-option name="op3">Option 4</asq-option>
-    </asq-multi-choice>
+    </asq-multi-choice-q>
 
 
-@element asq-multi-choice
+@element asq-multi-choice-q
 @group ASQ Elements
 @blurb Element acting as options in multichoice questions.
-@homepage http://github.com/ASQ-USI/asq-multi-choice
+@homepage http://github.com/ASQ-USI/asq-multi-choice-q
 -->
-<polymer-element name="asq-multi-choice" extends="core-selector">
+<polymer-element name="asq-multi-choice-q" extends="core-selector">
   <template>
     <style>
       :host {
@@ -128,7 +128,7 @@ attribute `multi` to true or false.
       onQuestionType: function(evt){
         if(!evt || ! evt.questionType) return;
 
-        if(evt.questionType == 'asq-multi-choice'){
+        if(evt.questionType == 'asq-multi-choice-q'){
           if(evt.type == "progress"){
             this.onProgress(evt.question);
           }else if(evt.type == "restorePresenter"){
@@ -245,7 +245,7 @@ attribute `multi` to true or false.
     }
 
     ASQ.asqify(p, true);
-    Polymer('asq-multi-choice', p);
+    Polymer('asq-multi-choice-q', p);
 
   })();
   </script>

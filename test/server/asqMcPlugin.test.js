@@ -20,7 +20,7 @@ describe("asqMcPlugin.js", function(){
       then: then
     });
 
-    this.tagName = "asq-multi-choice";
+    this.tagName = "asq-multi-choice-q";
 
     this.asq = {
       registerHook: function(){},
@@ -57,7 +57,7 @@ describe("asqMcPlugin.js", function(){
      this.asqMcPlugin.prototype.processEl.restore();
     });
 
-    it("should call processEl() for all asq-multi-choice elements", function(done){
+    it("should call processEl() for all asq-multi-choice-q elements", function(done){
       this.asqmc.parseHtml(this.simpleHtml)
       .then(function(){
         this.asqmc.processEl.calledTwice.should.equal(true);
