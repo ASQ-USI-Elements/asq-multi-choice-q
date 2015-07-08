@@ -1,6 +1,6 @@
 {
   "name": "asq-multi-choice",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "https://github.com/ASQ-USI/asq-multi-choice",
   "authors": [
     "Vasileios Triglianos <triglian@gmail.com>",
@@ -14,8 +14,9 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^0.5.1",
     "asq-base": "ASQ-USI/asq-base#master",
-    "asq-option": "ASQ-USI/asq-option#master"
-
+    "asq-option": "ASQ-USI/asq-option#master",
+    "core-selector": "Polymer/core-selector#^0.5.2",
+    "paper-radio-group": "Polymer/paper-radio-group#^0.5.2"
   },
   "ignore": [ "index.js", "lib", "package.json", "node_modules", ".npmignore", "test/server"],
   "devDependencies": {
