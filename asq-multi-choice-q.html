@@ -5,9 +5,10 @@
 <link rel="import" href="../asq-base/asq-base.html">
 
 <!--
-`asq-multi-choice-q` is always contains many options which is able to be selected.
-It is possible to select many options or only one option by setting the 
-attribute `multi` to true or false.
+`asq-multi-choice-q` contains several options that can be selected.
+It is possible to select either only one option or many options;
+this is controlled with the `multi` attribute, which is false by
+default (i.e., the default is only one option).
 
 ##### Example
     <asq-multi-choice-q multi>
@@ -58,7 +59,7 @@ attribute `multi` to true or false.
 
       publish: {
         /**
-         * Disable or endable this elements.
+         * Disable or enable this element.
          * 
          * @attribute disabled
          * @type boolean
@@ -69,7 +70,7 @@ attribute `multi` to true or false.
 
       multiChanged: function() {
         // console.log('multiChanged');
-        //make asq-option elements checkboxes or radio buttons
+        // change choice elements to checkboxes or radio buttons
         var inputType = ! this.multi
           ? 'radio'
           : 'checkbox';
