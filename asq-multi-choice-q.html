@@ -130,7 +130,7 @@ attribute `multi` to true or false.
 
         if(evt.questionType == 'asq-multi-choice-q'){
           if(evt.type == "progress"){
-            this.onProgress(evt.question);
+            this.onProgress(evt);
           }else if(evt.type == "restorePresenter"){
             if(this.role !== this.roles.PRESENTER) return;
             this.onRestorePresenter(evt);
@@ -173,10 +173,15 @@ attribute `multi` to true or false.
         opt.checked = val;
       },
 
-      onProgress: function(question){
-        if(question.uid !== this.uid) return;
+      onProgress: function(evt){
+        if(evt.question.question !== this.uid) return;
         if(this.role !== this.roles.PRESENTER) return;
-        this.updateProgress(question.options, question.total)
+
+        var optionsDictionary = {};
+        evt.question.options.forEach(function(option){
+          optionsDictionary[option._id] = option.sum;
+        }.bind(this));
+        this.updateProgress(optionsDictionary, evt.total)
       },
 
       updateProgress: function(options, total){
