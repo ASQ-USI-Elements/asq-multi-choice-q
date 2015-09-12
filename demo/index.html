@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="asq-elements" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>asq-multi-choice-q | Demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+
+
+  <link href="../asq-multi-choice-q.html" rel="import">
+
+
+  <link href="../../asq-option/asq-option.html" rel="import">
+  <link href="../../asq-stem/asq-stem.html" rel="import">
+  
+  <style is="custom-style">
+    .horizontal-section {
+      min-width: 200px;
+    }
+
+    asq-option {
+      display: block;
+    }
+
+    .asq-selected {
+      background-color: #ddd;
+    }
+
+
+  </style>
+
+
+</head>
+<body>
+
+  <asq-multi-choice-q selected="o" attr-for-selected="name" role="presenter">
+    <asq-option name="o">Oxygen</asq-option>
+    <asq-option name="c">Carbon</asq-option>
+    <asq-option name="h">Hydrogen</asq-option>
+    <asq-option name="n">Nitrogen</asq-option>
+    <asq-option name="ca">Calcium</asq-option>
+  </asq-multi-choice-q>
+
+  
+
+  <hr />
+
+  
+
+  <asq-multi-choice-q selected-values='["o", "c"]' multi >
+    <asq-option name="o">Oxygen</asq-option>
+    <asq-option name="c">Carbon</asq-option>
+    <asq-option name="h">Hydrogen</asq-option>
+    <asq-option name="n">Nitrogen</asq-option>
+    <asq-option name="ca">Calcium</asq-option>
+  </asq-multi-choice-q>
+
+  <hr />
+
+  <asq-stem><h4>Select the &quot;god&quot; in Egyptian hieroglyphs.</h4></asq-stem>
+  <asq-multi-choice-q selectable="img">
+
+    <img src="https://zh.wikipedia.org/static/1.26wmf20/extensions/wikihiero/img/hiero_G27.png" name="flamingo">
+    <img src="https://zh.wikipedia.org/static/1.26wmf20/extensions/wikihiero/img/hiero_G53.png" name="soul">
+    <img src="https://en.wikipedia.org/static/1.26wmf21/extensions/wikihiero/img/hiero_R8.png" name="god">
+  </asq-multi-choice-q>
+
+
+
+  <script>
+    var x = document.querySelectorAll('asq-multi-choice-q')[1];
+    var xImg = document.querySelector('asq-multi-choice-q[selectable=img]');
+    var pASQMC = document.querySelector("asq-multi-choice-q[role='presenter']");
+
+    pASQMC._answers = [
+      {
+        name: 'Bob',
+        checked: true
+      },
+      {
+        name: 'Tim',
+        checked: false
+      }
+    ];
+
+    window.onmessage = function(e){
+      if (typeof e.data.role == "string" && e.data.role.length > 0) {
+        var allAsqElements = document.querySelectorAll('html /deep/ *');
+        allAsqElements = Array.prototype.slice.call(allAsqElements).filter(function(el) {
+          return isASQEl(el);
+        });
+
+        //set role for every asq-element in this page
+        allAsqElements.forEach(function(elem, index) {
+          elem.role = e.data.role;
+        });
+      }
+
+      function isASQEl(el) {
+        return el.localName.indexOf('asq-') != -1;
+      } 
+    };
+  </script>
+
+
+</body>
+</html>

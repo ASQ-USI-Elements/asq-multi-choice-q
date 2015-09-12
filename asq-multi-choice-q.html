@@ -1,257 +1,274 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../asq-option/asq-option.html">
-<link rel="import" href="../core-selector/core-selector.html">
-<link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-base/asq-base.html">
 
+<link rel="import" href="../iron-selector/iron-multi-selectable.html">
+<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+
 <!--
-`asq-multi-choice-q` is always contains many options which is able to be selected.
-It is possible to select many options or only one option by setting the 
-attribute `multi` to true or false.
+`asq-multi-choice-q` is used to define choice questions. It basically has two modes, single or multi, by setting the 
+`multi` attribute. Normally, `asq-multi-choice-q` is used with 
+`asq-option` together by default. However it can also be used with other elements by setting the `selectable` attribute.
 
-##### Example
-    <asq-multi-choice-q multi>
-      <asq-stem><h3>You can choose any number of options</h3></asq-stem>
-      <asq-option name="op0" selected>Option 1</asq-option>
-      <asq-option name="op1"         >Option 2</asq-option>
-      <asq-option name="op2"         >Option 3</asq-option>
-      <asq-option name="op3" selected>Option 4</asq-option>
-    </asq-multi-choice-q>
+`asq-multi-choice-q` inherits the `Polymer.IronMultiSelectableBehavior` and adapts from `paper-radio-group`. 
 
+Examples:
+    
+    <asq-multi-choice-q selected="o" attr-for-selected="name">
+      <asq-option name="o">Oxygen</asq-option>
+      <asq-option name="c">Carbon</asq-option>
+      <asq-option name="h">Hydrogen</asq-option>
+      <asq-option name="n">Nitrogen</asq-option>
+      <asq-option name="ca">Calcium</asq-option>
+    </asq-multi-choice-q> 
 
-    <asq-multi-choice-q selected="3">
-      <asq-stem><h3>Here you can pick just one option</h3></asq-stem>
-      <asq-option name="op0">Option 1</asq-option>
-      <asq-option name="op1">Option 2</asq-option>
-      <asq-option name="op2">Option 3</asq-option>
-      <asq-option name="op3">Option 4</asq-option>
-    </asq-multi-choice-q>
+    <asq-multi-choice-q selected-values='["o", "c"]' multi>
+      <asq-option name="o">Oxygen</asq-option>
+      <asq-option name="c">Carbon</asq-option>
+      <asq-option name="h">Hydrogen</asq-option>
+      <asq-option name="n">Nitrogen</asq-option>
+      <asq-option name="ca">Calcium</asq-option>
+    </asq-multi-choice-q> 
 
+To pre-select some options, you may use `selected` attribtue in single mode or `selected-values` in multi mode. Note that in multi mode, the value of `selected-values` should be a **valid JSON string**. That is instead of using `"['o', 'c']"`, you need to use `'["o", "c"]'`.
 
-@element asq-multi-choice-q
+In single mode, you can also use arrow keys to select option.
+    
+
+@element asq-asq-multi-choice-q
+@demo demo/index.html
 @group ASQ Elements
-@blurb Element acting as options in multichoice questions.
+@blurb ASQ choice questions.
 @homepage http://github.com/ASQ-USI-Elements/asq-multi-choice-q
 -->
-<polymer-element name="asq-multi-choice-q" extends="core-selector">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-
-
-    </style>
-
-    <content select="asq-stem"></content>
-
-    <ol>
-      <shadow></shadow>
-    </ol>
-
-
-  </template>
-
-  <script>
-  (function() {
-    var p = {
-
-      publish: {
-        /**
-         * Disable or endable this elements.
-         * 
-         * @attribute disabled
-         * @type boolean
-         * @default false
-         */
-        disabled: {value: false, reflect: true}, 
-      },
-
-      multiChanged: function() {
-        // console.log('multiChanged');
-        //make asq-option elements checkboxes or radio buttons
-        var inputType = ! this.multi
-          ? 'radio'
-          : 'checkbox';
-
-      
-        this.getOptions().forEach(function(opt){
-          opt.type = inputType;
-        });
-      },
-
-      disabledChanged: function() {
-        for ( var x of this.getOptions() ) {
-          x.disabled = this.disabled;
-        }
-      },
-
-
-      /**
-       * Return all the *asq-option* elements.
-       *
-       * @method getOptions
-       * @return array all the *asq-option* elements
-       */
-      getOptions: function() {
-        return this.childNodes.array().filter(function(el) {
-          return el.isASQElement && el.nodeName == "ASQ-OPTION";
-        });
-      },
-
-      /**
-       * If true, this question becomes multi-choices quesiton.
-       * 
-       * @attribute multi
-       * @type boolean
-       * @default false
-       */
-      multi: false,
-
-      selectedAttribute: 'checked',
-
-      activateEvent: 'asq-change',
-
-      defaultExcludedLocalNames: 'asq-stem',
-
-      //
-      created: function(){
-        document.addEventListener('asq-ready', function(evt){
-          try {
-            this.subscribeToEvents(evt.detail.asqEventBus)
-          } catch(err){
-            console.debug('failed to subscribeToEvents');
-          }
-        }.bind(this));
-      },
-
-      onQuestionType: function(evt){
-        if(!evt || ! evt.questionType) return;
-
-        if(evt.questionType == 'asq-multi-choice-q'){
-          if(evt.type == "progress"){
-            this.onProgress(evt);
-          }else if(evt.type == "restorePresenter"){
-            if(this.role !== this.roles.PRESENTER) return;
-            this.onRestorePresenter(evt);
-          }
-          else if(evt.type == "restoreViewer"){
-            if(this.role !== this.roles.VIEWER) return;
-            this.onRestoreViewer(evt);
-          }
-        }
-      },
-
-      onRestorePresenter: function(evt){
-        evt.questions.forEach(function(q){
-          if(q.uid != this.uid) return;
-          var optionsDictionary = {};
-          q.data.options.forEach(function(option){
-            optionsDictionary[option.uid] = option.sum;
-          }.bind(this));
-          this.updateProgress(optionsDictionary, evt.total)
-        }.bind(this));
-      },
-
-      onRestoreViewer: function(evt){
-        evt.questions.forEach(function(q){
-          console.log(q)
-         if(q.uid != this.uid) return;
-          q.options.forEach(function(option){
-           this.updateOption(option._id, option.value);
-          }.bind(this));
-        }.bind(this));
-      },
-
-      updateOption: function(uid, val){
-        var opt = this.querySelector('asq-option[uid="' + uid + '"');
-        if(! opt){
-          console.log("Could not find option with uid %s", uid);
-          return;
-        }
-
-        opt.checked = val;
-      },
-
-      onProgress: function(evt){
-        if(evt.question.question !== this.uid) return;
-        if(this.role !== this.roles.PRESENTER) return;
-
-        var optionsDictionary = {};
-        evt.question.options.forEach(function(option){
-          optionsDictionary[option._id] = option.sum;
-        }.bind(this));
-        this.updateProgress(optionsDictionary, evt.total)
-      },
-
-      updateProgress: function(options, total){
-        total = total || 100;
-        for (var key in options){
-          if(options.hasOwnProperty(key)){
-            this.updateOptionProgress(key, options[key], total);
-          }
-        }
-      },
-
-      updateOptionProgress: function(uid, val, total){
-        var option = document.querySelector('asq-option[uid="'+ uid +'"]');
-        if(! option){
-          console.log('failed to updateOptionProgress, could not find option with uid %s', uid);
-          return;
-        }
-        var progressBar = option.shadowRoot.getElementById('progressBar');
-        progressBar.max = parseInt(total);
-        progressBar.value = parseInt(val);
-
-        var progressNum = option.shadowRoot.getElementById('progressNum');
-        progressNum.innerHTML = progressBar.value;
-      },
-
-      /**
-       * This question type is interested in two events: `asq:question_type`, which is emitted 
-       * when answer is submitted successfully.
-       *
-       */
-      subscribeToEvents: function(eventBus){
-        eventBus.on('asq:question_type', this.onQuestionType.bind(this));
-      },
-
-      /**
-       * The `submit` method returns an object that respresents the submission of this question. The object has the following structure:
-
-           {
-              questionUid: this.uid, 
-              timestamp: new Date(),
-              submission: [] 
-           }
-       * Only enabled when the `role` of the element is <b>viewer</b>.
-       *
-       * @method submit
-       */
-      submit: function() {
-        if ( this.role !== this.roles.VIEWER ) {
-          return;
-        }
-
-        var options = this.getOptions();
-
-        var submission = [];
-        options.forEach(function(elem, index) {
-          submission.push(elem.submit());
-        });   
-
-        return {
-          questionUid: this.uid,
-          timestamp: new Date(),
-          submission: submission
-        };
-      },
-
+<dom-module id="asq-multi-choice-q">
+  <style>
+    :host {
+      display: block;
     }
 
-    ASQ.asqify(p, true);
-    Polymer('asq-multi-choice-q', p);
+    :host ::content > * {
+      padding: 12px;
+    }
+  </style>
+  <template>
+    <content select="asq-stem"></content>
 
-  })();
+    <template is="dom-if" if="{{hasRole(roles.VIEWER)}}" restamp>
+      <content id="items" select="*"></content>
+    </template>
+
+    <template is="dom-if" if="{{hasRole(roles.PRESENTER)}}" restamp>
+      <content></content>
+
+      <div id="list-container">
+      <iron-list id="leList" items="[[_answers]]" as="answer">
+        <template>
+          <div class="{{_computeClass(selected)}}">
+            #<span>[[index]]</span>, Answer data from user: <span>[[answer.name]]</span>
+            <input type="checkbox" checked="[[answer.checked]]">
+          </div>
+        </template>
+      </iron-list>
+    </div>
+    </template>
+
+  </template>
+  <script>
+    Polymer({ 
+      is: 'asq-multi-choice-q',
+
+      behaviors: [
+        Polymer.IronMultiSelectableBehavior,
+        Polymer.IronA11yKeysBehavior,
+        ASQ.asqQuestionElementBehavior
+      ],
+
+
+      keyBindings: {
+        'left up': 'selectPrevious',
+        'right down': 'selectNext',
+      },
+
+
+      attached: function() {
+        // as domReady
+        this.async(function() {
+          this.setOptionsMulti();
+        });
+      },
+
+      
+      properties: {
+        /**
+         * Overriden from Polymer.IronMultiSelectableBehavior
+         * Modification: set the `reflectToAttribute` field.
+         *
+         * Decide the mode, single or multi.
+         */
+        multi: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          observer: 'multiChanged'
+        },
+
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         *
+         *  If you want to use the attribute value of an element for `selected` or `selected-values` instead of the index, set this to the name of the attribute.
+         * 
+         */
+        attrForSelected: {
+          type: String,
+          value: 'name'
+        },
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         *
+         * The attribute to set on elements when selected.
+         */
+        selectedAttribute: {
+          type: String,
+          value: 'checked'
+        },
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         *
+         * This is a CSS selector sting.  If this is set, only items that matches the CSS selector are selectable.
+         */
+        selectable: {
+          type: String,
+          value: 'asq-option'
+        },
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         * 
+         * The class to set on elements when selected.
+         *
+         * @attribute selectedClass
+         * @type {string}
+         */
+        selectedClass: {
+          type: String,
+          value: 'asq-selected'
+        },
+
+        _answers: {
+          type: Array,
+          notify: true
+        }
+
+      },
+
+      setOptionsMulti: function() {
+        for ( var i in this.items ) {
+          if ( typeof this.items[i].multi !== 'undefined' ) {
+            this.items[i].multi = this.multi;
+          }
+        }
+      },
+
+      /**
+       * Overriden from Polymer.IronMultiSelectableBehavior
+       *
+       * Modifications: 1) clear all selections first; 
+       * 2) propagate changes to all options.
+       *
+       * 
+       */
+      multiChanged: function(multi) {
+        this._selection.clear();
+        this._selection.multi = multi;
+        this.setOptionsMulti();
+      },
+
+
+      /**
+       * Selects the given value.
+       */
+      select: function(value) {
+
+        Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, [value]);
+        this.fire('asq-multi-choice-q-changed');
+      },
+
+      /**
+       * From PolymerElements/paper-radio-group.
+       * **Only** useful when `multi` is false.
+       * 
+       * Selects the previous item. If the previous item is disabled, then it is
+       * skipped, and its previous item is selected
+       */
+      selectPrevious: function() {
+        if ( this.multi ) return;
+        var length = this.items.length;
+        var newIndex = Number(this._valueToIndex(this.selected));
+
+        do {
+          newIndex = (newIndex - 1 + length) % length;
+        } while (this.items[newIndex].disabled)
+
+        this.select(this._indexToValue(newIndex));
+      },
+
+      /**
+       * From PolymerElements/paper-radio-group.
+       * **Only** useful when `multi` is false.
+       * 
+       * Selects the next item. If the next item is disabled, then it is
+       * skipped, and the next item after it is selected.
+       */
+      selectNext: function() {
+        if ( this.multi ) return;
+        var length = this.items.length;
+        var newIndex = Number(this._valueToIndex(this.selected));
+
+        do {
+          newIndex = (newIndex + 1 + length) % length;
+        } while (this.items[newIndex].disabled)
+
+        this.select(this._indexToValue(newIndex));
+      },
+
+      hasRole: function (role) {
+        return this.role == role;
+      },
+
+      _computeClass: function (selected) {
+        var classList = 'row list-item';
+        if (selected) classList += ' selected';
+        return classList;
+      },
+
+
+      submit: function() {
+        if ( this.role !== this.roles.VIEWER ) return;
+
+        var options = [];
+
+        for ( var i in this.items ) {
+          var name = this.items[i].getAttribute(this.attrForSelected);
+          if ( name === '' ) name = i; 
+          options.push({
+            uid: this.items[i].uid,
+            name: name,
+            value: this.items[i].checked
+          });
+        }
+
+        return {
+          uid: this.uid,
+          timestamp: new Date(),
+          options: options
+        }
+      }
+      
+    });
   </script>
-</polymer-element>
+</dom-module>
