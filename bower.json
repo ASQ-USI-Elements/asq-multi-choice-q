@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "polymer": "Polymer/Polymer#~1.0.8",
+    "asq-base": "ASQ-USI-Elements/asq-base#feat-polymer-1",
     "iron-selector": "PolymerElements/iron-selector#~1.0.2",
     "paper-radio-group": "PolymerElements/paper-radio-group",
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.10",
