@@ -101,13 +101,13 @@ In single mode, you can also use arrow keys to select option.
           }
         }.bind(this));
 
-        this.listen(this, 'asq-role-changed', '_onRoleChanged')
+        this.listen(this, 'role-changed', '_onRoleChanged')
       },
 
       // clear all selections when role has changed 
       _onRoleChanged: function() {
         if ( this._initialized ) {
-          this._selection.clear();
+          this.clear();
         }
       },
 
@@ -228,7 +228,9 @@ In single mode, you can also use arrow keys to select option.
        * 
        */
       multiChanged: function(multi) {
-        this._selection.clear();
+        if ( this._initialized ) {
+          this.clear();
+        }
         this._selection.multi = multi;
         this._setOptions('multi', this.multi);
       },
@@ -254,6 +256,14 @@ In single mode, you can also use arrow keys to select option.
       select: function(value) {
         Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, [value]);
         this.fire('asq-multi-choice-q-changed');
+      },
+
+      /**
+       * Clear all selections.
+       */
+      clear: function() {
+        this.selected = '';
+        this.selectedValues = [];
       },
 
       /**
@@ -433,8 +443,6 @@ In single mode, you can also use arrow keys to select option.
         }
         this.toggle(option.getAttribute(this.attrForSelected), value);
       }
-
-      
       
     });
   </script>
