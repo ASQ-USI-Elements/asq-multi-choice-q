@@ -7,12 +7,13 @@
 
   <script src="../../webcomponentsjs/webcomponents.js"></script>
 
+  <link rel="import" href="../asq-multi-choice-q.html" >
+  <link rel="import" href="../../asq-option/asq-option.html" >
+  <link rel="import" href="../../asq-stem/asq-stem.html" >
 
-  <link href="../asq-multi-choice-q.html" rel="import">
+  <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
 
-
-  <link href="../../asq-option/asq-option.html" rel="import">
-  <link href="../../asq-stem/asq-stem.html" rel="import">
+  <link rel="import" href="../../paper-styles/color.html">
   
   <style is="custom-style">
     .horizontal-section {
@@ -24,9 +25,55 @@
     }
 
     .asq-selected {
-      background-color: #ddd;
+      background-color: #75B7BE;
     }
 
+
+    .horizontal-section-container {
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+      @apply(--layout-wrap);
+    }
+
+    .vertical-section-container {
+      @apply(--layout-vertical);
+      @apply(--center-justified);
+    }
+
+    .horizontal-section {
+      background-color: white;
+      padding: 24px;
+      margin-right: 24px;
+      min-width: 200px;
+
+      @apply(--shadow-elevation-2dp);
+    }
+
+    .flex {
+      flex: auto;
+    }
+
+    .vertical-section {
+      background-color: white;
+      padding: 24px;
+      margin: 0 24px 24px 24px;
+
+      @apply(--shadow-elevation-2dp);
+    }
+
+    .centered {
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    code {
+      color: var(--google-grey-700);
+    }
+
+    .attr {
+      color: var(--paper-orange-700);
+    }
 
   </style>
 
@@ -34,55 +81,66 @@
 </head>
 <body>
 
-  <asq-multi-choice-q selected="o" attr-for-selected="name" role="presenter">
-    <asq-option name="o">Oxygen</asq-option>
-    <asq-option name="c">Carbon</asq-option>
-    <asq-option name="h">Hydrogen</asq-option>
-    <asq-option name="n">Nitrogen</asq-option>
-    <asq-option name="ca">Calcium</asq-option>
-  </asq-multi-choice-q>
+  <div class="vertical-section-container">
 
-  
+    <div class="vertical-section horizontal-section-container">
+      <div class="horizontal-section flex">
+        <h4>A <i class="attr">single</i> mode <code>asq-multi-choice-q</code> question for viewer.</h4>
+        <asq-multi-choice-q selected="n" attr-for-selected="name">
+          <asq-option name="o">Oxygen</asq-option>
+          <asq-option name="c">Carbon</asq-option>
+          <asq-option name="h">Hydrogen</asq-option>
+          <asq-option name="n">Nitrogen</asq-option>
+          <asq-option name="ca">Calcium</asq-option>
+        </asq-multi-choice-q>
+      </div>
 
-  <hr />
+      <div class="horizontal-section flex">
+        <h4>A <i class="attr">single</i> mode <code>asq-multi-choice-q</code> question for presenter.</h4>
+        <asq-multi-choice-q attr-for-selected="name" role="presenter">
+          <asq-option name="o">Oxygen</asq-option>
+          <asq-option name="c">Carbon</asq-option>
+          <asq-option name="h">Hydrogen</asq-option>
+          <asq-option name="n">Nitrogen</asq-option>
+          <asq-option name="ca">Calcium</asq-option>
+        </asq-multi-choice-q>
+      </div>
+    </div>
 
-  
+    <div class="vertical-section horizontal-section-container">
+      <div class="horizontal-section flex">
+        <h4>A <i class="attr">multi</i> mode <code>asq-multi-choice-q</code> question for viewer.</h4>
+        <asq-multi-choice-q selected-values='["h", "ca"]' multi >
+          <asq-option name="o">Oxygen</asq-option>
+          <asq-option name="c">Carbon</asq-option>
+          <asq-option name="h">Hydrogen</asq-option>
+          <asq-option name="n">Nitrogen</asq-option>
+          <asq-option name="ca">Calcium</asq-option>
+        </asq-multi-choice-q>
+      </div>
 
-  <asq-multi-choice-q selected-values='["o", "c"]' multi >
-    <asq-option name="o">Oxygen</asq-option>
-    <asq-option name="c">Carbon</asq-option>
-    <asq-option name="h">Hydrogen</asq-option>
-    <asq-option name="n">Nitrogen</asq-option>
-    <asq-option name="ca">Calcium</asq-option>
-  </asq-multi-choice-q>
-
-  <hr />
-
-  <asq-stem><h4>Select the &quot;god&quot; in Egyptian hieroglyphs.</h4></asq-stem>
-  <asq-multi-choice-q selectable="img">
-
-    <img src="https://zh.wikipedia.org/static/1.26wmf20/extensions/wikihiero/img/hiero_G27.png" name="flamingo">
-    <img src="https://zh.wikipedia.org/static/1.26wmf20/extensions/wikihiero/img/hiero_G53.png" name="soul">
-    <img src="https://en.wikipedia.org/static/1.26wmf21/extensions/wikihiero/img/hiero_R8.png" name="god">
-  </asq-multi-choice-q>
+      <div class="horizontal-section flex">
+        <h4>A <i class="attr">multi</i> mode <code>asq-multi-choice-q</code> question for presenter.</h4>
+        <asq-multi-choice-q attr-for-selected="name" role="presenter">
+          <asq-option name="o">Oxygen</asq-option>
+          <asq-option name="c">Carbon</asq-option>
+          <asq-option name="h">Hydrogen</asq-option>
+          <asq-option name="n">Nitrogen</asq-option>
+          <asq-option name="ca">Calcium</asq-option>
+        </asq-multi-choice-q>
+      </div>
+    </div>
 
 
 
   <script>
-    var x = document.querySelectorAll('asq-multi-choice-q')[1];
+    var x = document.querySelectorAll('asq-multi-choice-q')[0];
+    var y = document.querySelectorAll('asq-multi-choice-q')[1];
     var xImg = document.querySelector('asq-multi-choice-q[selectable=img]');
     var pASQMC = document.querySelector("asq-multi-choice-q[role='presenter']");
 
-    pASQMC._answers = [
-      {
-        name: 'Bob',
-        checked: true
-      },
-      {
-        name: 'Tim',
-        checked: false
-      }
-    ];
+
+    
 
     window.onmessage = function(e){
       if (typeof e.data.role == "string" && e.data.role.length > 0) {
