@@ -55,11 +55,11 @@ In single mode, you can also use arrow keys to select option.
   <template>
     <content select="asq-stem"></content>
 
-    <template is="dom-if" if="{{hasRole(roles.VIEWER)}}" restamp>
+    <template is="dom-if" if="{{hasRole(role, roles.VIEWER)}}" restamp>
       <content id="items" select="*"></content>
     </template>
 
-    <template is="dom-if" if="{{hasRole(roles.PRESENTER)}}" restamp>
+    <template is="dom-if" if="{{hasRole(role, roles.PRESENTER)}}" restamp>
       <content></content>
 
       <div id="list-container">
@@ -92,10 +92,41 @@ In single mode, you can also use arrow keys to select option.
       },
 
 
+      created: function(){
+        document.addEventListener('asq-ready', function(evt){
+          try {
+            this._subscribeToEvents(evt.detail.asqEventBus)
+          } catch(err){
+            console.debug('failed to subscribeToEvents');
+          }
+        }.bind(this));
+
+        this.listen(this, 'asq-role-changed', '_onRoleChanged')
+      },
+
+      // clear all selections when role has changed 
+      _onRoleChanged: function() {
+        if ( this._initialized ) {
+          this._selection.clear();
+        }
+      },
+
+
       attached: function() {
+        this._initialized = true;
+        Polymer.dom.flush();
+
         // as domReady
+        // We have to do this to wait for the ready of lightdom elements.
+        // See details here: https://goo.gl/huOBKi
         this.async(function() {
-          this.setOptionsMulti();
+          this._initOptions();
+        });
+
+        this.fire('asq-initialized', {
+          is: this.is, 
+          which: this,
+          initialized: this._initialized
         });
       },
 
@@ -162,14 +193,28 @@ In single mode, you can also use arrow keys to select option.
         _answers: {
           type: Array,
           notify: true
+        },
+
+        _initialized: {
+          type: Boolean,
+          value: false,
+          notify: true
         }
 
       },
 
-      setOptionsMulti: function() {
+      _initOptions: function() {
+        this._setOptions('multi', this.multi);
+
+        // Manually call the `_propagateRole` in because 
+        // `domReady` is not part of the lifecycle of Polymer. 
+        this._propagateRole(this.role);
+      },
+
+      _setOptions: function(attr, value) {
         for ( var i in this.items ) {
-          if ( typeof this.items[i].multi !== 'undefined' ) {
-            this.items[i].multi = this.multi;
+          if ( typeof this.items[i][attr] !== 'undefined' ) {
+            this.items[i][attr] = value;
           }
         }
       },
@@ -185,18 +230,42 @@ In single mode, you can also use arrow keys to select option.
       multiChanged: function(multi) {
         this._selection.clear();
         this._selection.multi = multi;
-        this.setOptionsMulti();
+        this._setOptions('multi', this.multi);
       },
 
+
+      /**
+       * Toggle the given value.
+       */
+      toggle: function(value, flag) {
+        if (typeof flag === 'undefined') {
+          this.select(value);
+          return
+        }
+        
+        if ( typeof flag === 'boolean' && flag !== this.hasSelected(value) ) {
+          this.select(value);
+        }
+      },
 
       /**
        * Selects the given value.
        */
       select: function(value) {
-
         Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, [value]);
         this.fire('asq-multi-choice-q-changed');
       },
+
+      /**
+       * Check if the given value has been selected.
+       */
+      hasSelected: function(value) {
+        if ( ! this.multi ) 
+          return this.selected === value 
+        else 
+          return this.selectedValues.indexOf(value) >=0 
+      },
+
 
       /**
        * From PolymerElements/paper-radio-group.
@@ -236,8 +305,8 @@ In single mode, you can also use arrow keys to select option.
         this.select(this._indexToValue(newIndex));
       },
 
-      hasRole: function (role) {
-        return this.role == role;
+      hasRole: function (role, candidate) {
+        return role == candidate;
       },
 
       _computeClass: function (selected) {
@@ -258,7 +327,7 @@ In single mode, you can also use arrow keys to select option.
           options.push({
             uid: this.items[i].uid,
             name: name,
-            value: this.items[i].checked
+            value: this.items[i].hasAttribute(this.selectedAttribute)
           });
         }
 
@@ -267,7 +336,105 @@ In single mode, you can also use arrow keys to select option.
           timestamp: new Date(),
           options: options
         }
+      },
+
+      _subscribeToEvents: function (eventBus) {
+        eventBus.on('asq:question_type', this._onQuestionType.bind(this));
+      },
+
+      _onQuestionType: function(evt){
+        if (!evt || ! evt.questionType) return;
+
+        if ( evt.questionType == 'asq-multi-choice-q' ) {
+          if ( evt.type == 'progress' ){
+            this._onProgress(evt);
+          } 
+          else if(evt.type == 'restorePresenter'){
+            if(this.role !== this.roles.PRESENTER) return;
+            this._onRestorePresenter(evt);
+          }
+          else if(evt.type == 'restoreViewer'){
+            if(this.role !== this.roles.VIEWER) return;
+            this._onRestoreViewer(evt);
+          }
+        }
+      },
+
+      _onProgress: function(evt){
+        if ( evt.question.question !== this.uid ) return;
+
+        if ( this.role !== this.roles.PRESENTER ) return;
+
+        var optionsDictionary = {};
+        evt.question.options.forEach(function(option){
+          optionsDictionary[option._id] = option.sum;
+        }.bind(this));
+
+        this._updateProgress(optionsDictionary, evt.total)
+      },
+
+      _onRestorePresenter: function(evt){
+        evt.questions.forEach(function(q){
+          if( q.uid != this.uid ) return;
+
+          var optionsDictionary = {};
+          q.data.options.forEach(function(option){
+            optionsDictionary[option.uid] = option.sum;
+          }.bind(this));
+
+          this._updateProgress(optionsDictionary, evt.total)
+        }.bind(this));
+      },
+
+      _updateProgress: function(options, total){
+        total = total || 100;
+        for (var key in options){
+          if(options.hasOwnProperty(key)){
+            this._updateOptionProgress(key, options[key], total);
+          }
+        }
+      },
+
+      // zhenfei: may use ECMA 6 Array.prototype.find instead ?
+      _findOptionById: function(uid) {
+        for ( var i in this.items ) {
+          if ( this.items[i].uid == uid ) {
+            return this.items[i]
+          }
+        }
+      },
+
+      _updateOptionProgress: function(uid, value, total){
+        var option = this._findOptionById(uid);
+        if(! option){
+          console.error('Failed to updateOptionProgress; could not find option with uid %s', uid);
+          return;
+        }
+        option.progressValue = value;
+        option.progressMax = total;
+      },
+      
+      _onRestoreViewer: function(evt){
+        evt.questions.forEach(function(q){
+
+        if( q.uid != this.uid ) return;
+          q.options.forEach(function(option){
+           this._updateOption(option._id, option.value);
+          }.bind(this));
+        }.bind(this));
+      },
+
+      // value is boolean, meaning checked or not.
+      _updateOption: function(uid, value){
+        var option = this._findOptionById(uid);
+        if(! option){
+          console.error('Failed to updateOption; could not find option with uid %s', uid);
+          return;
+        }
+        this.toggle(option.getAttribute(this.attrForSelected), value);
       }
+
+      
       
     });
   </script>
