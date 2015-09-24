@@ -14,11 +14,12 @@
   "dependencies": {
     "polymer": "Polymer/Polymer#~1.0.8",
     "asq-base": "ASQ-USI-Elements/asq-base#feat-polymer-1",
+    "asq-option": "ASQ-USI-Elements/asq-option#feat-polymer-1",
     "iron-selector": "PolymerElements/iron-selector#~1.0.2",
     "paper-radio-group": "PolymerElements/paper-radio-group",
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.10",
-    "asq-base": "ASQ-USI-Elements/asq-base#feat-polymer-1",
-    "iron-list": "polymerelements/iron-list#~1.0.2"
+    "iron-list": "polymerelements/iron-list#~1.0.2",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0"    
   },
   "ignore": [ "index.js", "lib", "package.json", "node_modules", ".npmignore", "test/server"],
   "devDependencies": {
