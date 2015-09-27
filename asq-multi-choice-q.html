@@ -322,10 +322,6 @@ In single mode, you can also use arrow keys to select option.
         this.select(this._indexToValue(newIndex));
       },
 
-      hasRole: function (role, candidate) {
-        return role == candidate;
-      },
-
       _computeClass: function (selected) {
         var classList = 'row list-item';
         if (selected) classList += ' selected';
