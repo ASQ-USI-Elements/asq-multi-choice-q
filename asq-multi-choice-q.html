@@ -411,12 +411,14 @@ In single mode, you can also use arrow keys to select option.
       },
 
       _onRestorePresenter: function(evt){
+        if ( !evt.questions ) return;
+        
         evt.questions.forEach(function(q){
           if( q.uid != this.uid ) return;
 
           var optionsDictionary = {};
           q.data.options.forEach(function(option){
-            optionsDictionary[option.uid] = option.sum;
+            optionsDictionary[option._id] = option.sum;
           }.bind(this));
 
           this._updateProgress(optionsDictionary, evt.total)
@@ -452,8 +454,9 @@ In single mode, you can also use arrow keys to select option.
       },
       
       _onRestoreViewer: function(evt){
+        if ( !evt.questions ) return;
+        
         evt.questions.forEach(function(q){
-
         if( q.uid != this.uid ) return;
           q.options.forEach(function(option){
            this._updateOption(option._id, option.value);
