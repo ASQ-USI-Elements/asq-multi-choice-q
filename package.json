@@ -1,13 +1,10 @@
 {
   "name": "asq-multi-choice-q",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "description": "Multi-choice question type for ASQ.",
   "author": "Zhenfei Nie <zhen.fei.nie@usi.ch>, Vassilis Triglianos <triglian@gmail.com>",
   "homepage": "https://github.com/ASQ-USI-Elements/asq-multi-choice-q",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git@github.com:ASQ-USI-Elements/asq-multi-choice-q.git"

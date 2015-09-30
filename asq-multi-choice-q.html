@@ -101,7 +101,8 @@ In single mode, you can also use arrow keys to select option.
           }
         }.bind(this));
 
-        this.listen(this, 'role-changed', '_onRoleChanged')
+        this.listen(this, 'role-changed', '_onRoleChanged');
+
       },
 
       // clear all selections when role has changed 
@@ -203,6 +204,14 @@ In single mode, you can also use arrow keys to select option.
           type: Boolean,
           value: false,
           notify: true
+        },
+
+        selectedValues: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return []
+          }
         }
 
       },
@@ -283,7 +292,7 @@ In single mode, you can also use arrow keys to select option.
       hasSelected: function(value) {
         if ( ! this.multi ) 
           return this.selected === value 
-        else 
+        else
           return this.selectedValues.indexOf(value) >=0 
       },
 
@@ -360,7 +369,7 @@ In single mode, you can also use arrow keys to select option.
         }
 
         return {
-          uid: this.uid,
+          questionUid: this.uid,
           timestamp: new Date(),
           options: options
         }
