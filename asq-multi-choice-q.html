@@ -112,7 +112,6 @@ In single mode, you can also use arrow keys to select option.
         }
       },
 
-
       attached: function() {
         this._initialized = true;
         Polymer.dom.flush();
@@ -129,10 +128,11 @@ In single mode, you can also use arrow keys to select option.
           which: this,
           initialized: this._initialized
         });
-      },
 
-      _removeListener: function(eventName) {
-        // zhenfei: stop from removing listener
+        // TODO: temp solution before the pull request gets merged:
+        // https://github.com/PolymerElements/iron-selector/pull/64
+        this._removeListener(this.activateEvent);
+        this._addListener(this.activateEvent);  
       },
 
       
