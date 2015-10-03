@@ -66,15 +66,7 @@ In single mode, you can also use arrow keys to select option.
       ],
 
 
-      created: function(){
-        document.addEventListener('asq-ready', function(evt){
-          try {
-            this._subscribeToEvents(evt.detail.asqEventBus)
-          } catch(err){
-            console.debug('failed to subscribeToEvents');
-          }
-        }.bind(this));
-
+      created: function() {
         this.listen(this, 'role-changed', '_onRoleChanged');
       },
 
@@ -280,13 +272,19 @@ In single mode, you can also use arrow keys to select option.
 
 
 
-      _subscribeToEvents: function (eventBus) {
+      _eventBusChanged: function (eventBus) {
+        if(!eventBus) return;
         eventBus.on('asq:question_type', this._onQuestionType.bind(this));
       },
 
+
       _onQuestionType: function(evt){
         if (!evt || ! evt.questionType) return;
-
+        // FIXME
+        // A strange problem: it will get an event twice
+        // with different `this`!! 
+        if ( this.items.length === 0 ) return;
+        
         if ( evt.questionType == 'asq-multi-choice-q' ) {
           if ( evt.type == 'progress' ){
             this._onProgress(evt);

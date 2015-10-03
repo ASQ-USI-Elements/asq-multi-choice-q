@@ -197,6 +197,7 @@ In single mode, you can also use arrow keys to select option.
 
         this.listen(this, 'role-changed', '_onRoleChanged');
         this.listen(this, 'asq-option-ready', '_onOptionReady');
+        this.listen(this, 'asq-initialized', '_onInitialized');
       },
 
       _onOptionReady: function() {
@@ -210,6 +211,10 @@ In single mode, you can also use arrow keys to select option.
       },
 
       _onRoleChanged: function() {
+        this._setApi();
+      },
+
+      _onInitialized: function() {
         this._setApi();
       },
 
