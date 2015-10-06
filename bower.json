@@ -12,7 +12,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "polymer": "Polymer/Polymer#~1.0.8",
+    "polymer": "Polymer/Polymer#~1.1.3",
     "asq-base": "ASQ-USI-Elements/asq-base#feat-polymer-1",
     "asq-option": "ASQ-USI-Elements/asq-option#feat-polymer-1",
     "iron-selector": "PolymerElements/iron-selector#~1.0.2",
