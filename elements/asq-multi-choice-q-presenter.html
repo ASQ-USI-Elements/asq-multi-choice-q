@@ -87,6 +87,7 @@ In single mode, you can also use arrow keys to select option.
         // See details here: https://goo.gl/huOBKi
         this.async(function() {
           this._initOptions();
+          this._setOptions('disabled', this.disabled);
         });
 
         this.fire('asq-initialized', {
@@ -103,6 +104,17 @@ In single mode, you can also use arrow keys to select option.
 
       
       properties: {
+        /**
+         * Disable or enable the element. Changes will be also
+         * propagated to inner propagated elements.
+         */
+        disabled: { 
+          type: Boolean,
+          value: false,
+          notify: true, 
+          observer: '_disabledChanged',
+          reflectToAttribute: true
+        },
         /**
          * Overriden from Polymer.IronMultiSelectableBehavior
          * Modification: set the `reflectToAttribute` field.
@@ -222,6 +234,9 @@ In single mode, you can also use arrow keys to select option.
         this._setOptions('multi', this.multi);
       },
 
+      _disabledChanged: function(disabled) {
+        this._setOptions('disabled', this.disabled);
+      },
 
       /**
        * Toggle the given value. By setting the `flag` you can make

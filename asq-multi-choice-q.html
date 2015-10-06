@@ -52,6 +52,7 @@ In single mode, you can also use arrow keys to select option.
         role="viewer" 
         uid="[[uid]]"
         multi="{{multi}}"
+        disabled="{{disabled}}"
         attr-for-selected="{{attrForSelected}}"
         selectable="{{selectable}}"
         selected-class="{{selectedClass}}"
@@ -69,6 +70,7 @@ In single mode, you can also use arrow keys to select option.
         role="presenter" 
         uid="[[uid]]" 
         multi="{{multi}}"
+        disabled="{{disabled}}"
         attr-for-selected="{{attrForSelected}}"
         selectable="{{selectable}}"
         selected-class="{{selectedClass}}"
@@ -89,6 +91,16 @@ In single mode, you can also use arrow keys to select option.
 
 
       properties: {
+        /**
+         * Disable or enable the element. Changes will be also
+         * propagated to inner propagated elements.
+         */
+        disabled: { 
+          type: Boolean,
+          value: false,
+          notify: true, 
+          reflectToAttribute: true
+        },
         /**
          * Overriden from Polymer.IronMultiSelectableBehavior
          * Modification: set the `reflectToAttribute` field.

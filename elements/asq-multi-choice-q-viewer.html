@@ -96,6 +96,7 @@ In single mode, you can also use arrow keys to select option.
           this._initOptions();
           // tmp: 
           this._updateSelected();
+          this._setOptions('disabled', this.disabled);
         });
 
         // TODO: temp solution before the pull request gets merged:
@@ -113,6 +114,17 @@ In single mode, you can also use arrow keys to select option.
 
       
       properties: {
+        /**
+         * Disable or enable the element. Changes will be also
+         * propagated to inner propagated elements.
+         */
+        disabled: { 
+          type: Boolean,
+          value: false,
+          notify: true, 
+          observer: '_disabledChanged',
+          reflectToAttribute: true
+        },
         /**
          * Overriden from Polymer.IronMultiSelectableBehavior
          * Modification: set the `reflectToAttribute` field.
@@ -224,6 +236,10 @@ In single mode, you can also use arrow keys to select option.
         }
         this._selection.multi = multi;
         this._setOptions('multi', this.multi);
+      },
+
+      _disabledChanged: function(disabled) {
+        this._setOptions('disabled', this.disabled)
       },
 
 
