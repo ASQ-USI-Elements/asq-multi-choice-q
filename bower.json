@@ -19,9 +19,17 @@
     "paper-radio-group": "PolymerElements/paper-radio-group",
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.10",
     "iron-list": "polymerelements/iron-list#~1.0.2",
-    "paper-styles": "PolymerElements/paper-styles#^1.0.0"    
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#1.0.10"
   },
-  "ignore": [ "index.js", "lib", "package.json", "node_modules", ".npmignore", "test/server"],
+  "ignore": [
+    "index.js",
+    "lib",
+    "package.json",
+    "node_modules",
+    ".npmignore",
+    "test/server"
+  ],
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^2.0.0-rc1",
     "iron-component-page": "PolymerElements/iron-component-page#~1.0.5"

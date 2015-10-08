@@ -1,9 +1,11 @@
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../asq-base/asq-base.html">
 
 <link rel="import" href="../../iron-selector/iron-multi-selectable.html">
 <link rel="import" href="../../iron-list/iron-list.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+
 
 <!--
 `asq-multi-choice-q` is used to define choice questions. It basically has two modes, single or multi, by setting the 
@@ -50,10 +52,20 @@ In single mode, you can also use arrow keys to select option.
     :host ::content > * {
       padding: 12px;
     }
+    
+    /* Somehow the paper ripple inside the paper-toggle-button
+    has an absolute positioning, and then takes over the whole page up
+    to the nearest relative parent unless we set the toggle position to `relative` 
+    */
+    #statsToggle{
+      position:relative;
+    }
   </style>
   <template>
     <content select="asq-stem"></content>
-    <content></content>
+    <span class="stats-label">Statistics</span> <paper-toggle-button id="statsToggle" on-iron-change="_onStatsToggleChange"></paper-toggle-button>
+    <content id="optionsContent" select="asq-option"></content>
+    <content ></content>
   </template>
   <script>
     Polymer({ 
@@ -88,6 +100,7 @@ In single mode, you can also use arrow keys to select option.
         this.async(function() {
           this._initOptions();
           this._setOptions('disabled', this.disabled);
+          this._showOptionsProgress(this.$.statsToggle.checked);
         });
 
         this.fire('asq-initialized', {
@@ -200,11 +213,26 @@ In single mode, you can also use arrow keys to select option.
 
       },
 
+      _onStatsToggleChange: function(evt, detail){
+        this._showOptionsProgress(this.$.statsToggle.checked);
+      },
+
+      _showOptionsProgress: function(val){
+
+        // We have to do this to wait for the ready of lightdom elements.
+        // See details here: https://goo.gl/huOBKi
+        this.async(function() {
+          Polymer.dom(this.$.optionsContent).getDistributedNodes().forEach(function(op){
+            op.displayProgress = val;
+          })
+        });
+      },
+
       _initOptions: function() {
         this._setOptions('multi', this.multi);
         // FIXME: three ways around to set role of asq-option
         // 1. listen to `asq-option-ready` at asq-multi-choice;
-        // 2. overrite the _propagateRole in asq-base by using
+        // 2. overwrite the _propagateRole in asq-base by using
         // Polymer.dom(this).queryDistributedElements.
         // 3. use method below
         // this._setOptions('role', this.role);
