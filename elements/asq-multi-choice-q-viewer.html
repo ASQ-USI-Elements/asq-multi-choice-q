@@ -226,8 +226,11 @@ In single mode, you can also use arrow keys to select option.
         for ( var i in newVal ) {
           for ( var j in this.items ) {
             var name = this.items[j].getAttribute(this.attrForSelected);
+            var uid = this.items[j].uid;
             if ( name === '' ) name = i; 
-            if(newVal[i].name === name){
+            // maybe it's a security problem matching on the name?
+            // should we only match in the uid
+            if(newVal[i].uid === uid|| newVal[i].name === name){
               if(this.items[j].hasAttribute(this.selectedAttribute) != newVal[i].value){
                 this.select(name);
               }

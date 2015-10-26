@@ -115,7 +115,7 @@ In single mode, you can also use arrow keys to select option.
       
       properties: {
         /**
-         * The selected options. Doesn't do anything in presenter right now
+         * The selected options. Doesn't do anything in presenter right now.
          */
         value: {
           type: Object,
@@ -349,7 +349,7 @@ In single mode, you can also use arrow keys to select option.
 
         var optionsDictionary = {};
         evt.question.options.forEach(function(option){
-          optionsDictionary[option._id] = option.sum;
+          optionsDictionary[option.uid] = option.sum;
         }.bind(this));
 
         this._updateProgress(optionsDictionary, evt.total)
@@ -363,7 +363,7 @@ In single mode, you can also use arrow keys to select option.
 
           var optionsDictionary = {};
           q.data.options.forEach(function(option){
-            optionsDictionary[option._id] = option.sum;
+            optionsDictionary[option.uid] = option.sum;
           }.bind(this));
 
           this._updateProgress(optionsDictionary, evt.total)
