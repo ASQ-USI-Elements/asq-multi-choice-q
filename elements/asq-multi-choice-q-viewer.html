@@ -63,6 +63,11 @@ In single mode, you can also use arrow keys to select option.
         ASQ.asqQuestionElementBehavior
       ],
 
+      listeners: {
+        'iron-select' : '_onIronSelect',
+        'iron-deselect' : '_onIronDeselect',
+        'iron-items-changed' : '_onIronItemsChanged'
+      },
 
       keyBindings: {
         'left up': 'selectPrevious',
@@ -112,6 +117,15 @@ In single mode, you can also use arrow keys to select option.
       
       properties: {
         /**
+         * The selected options.
+         */
+        value: {
+          type: Object,
+          notify: true,
+          observer: '_valueChanged'
+        },
+
+        /**
          * Disable or enable the element. Changes will be also
          * propagated to inner propagated elements.
          */
@@ -122,6 +136,7 @@ In single mode, you can also use arrow keys to select option.
           observer: '_disabledChanged',
           reflectToAttribute: true
         },
+
         /**
          * Overriden from Polymer.IronMultiSelectableBehavior
          * Modification: set the `reflectToAttribute` field.
@@ -205,6 +220,48 @@ In single mode, you can also use arrow keys to select option.
           notify: true
         },
 
+      },
+
+      _valueChanged : function(newVal, oldVal){
+        for ( var i in newVal ) {
+          for ( var j in this.items ) {
+            var name = this.items[j].getAttribute(this.attrForSelected);
+            if ( name === '' ) name = i; 
+            if(newVal[i].name === name){
+              if(this.items[j].hasAttribute(this.selectedAttribute) != newVal[i].value){
+                this.select(name);
+              }
+            }
+          } 
+        }
+      },
+
+      _onIronSelect: function(){
+        this.value = this._getValue();
+      },
+
+      _onIronDeselect: function(){
+        this.value = this._getValue();
+      },
+
+      _onIronItemsChanged: function(){
+        this.value = this._getValue();
+      },
+
+      _getValue: function(){
+        var options = [];
+
+        for ( var i in this.items ) {
+          var name = this.items[i].getAttribute(this.attrForSelected);
+          if ( name === '' ) name = i; 
+          options.push({
+            uid: this.items[i].uid,
+            name: name,
+            value: this.items[i].hasAttribute(this.selectedAttribute)
+          });
+        }
+
+        return options;
       },
 
       _initOptions: function() {
