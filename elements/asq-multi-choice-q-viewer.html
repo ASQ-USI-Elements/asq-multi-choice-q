@@ -229,8 +229,9 @@ In single mode, you can also use arrow keys to select option.
             var uid = this.items[j].uid;
             if ( name === '' ) name = i; 
             // maybe it's a security problem matching on the name?
-            // should we only match in the uid
-            if(newVal[i].uid === uid|| newVal[i].name === name){
+            // should we only match in the uid?
+            if(( newVal[i].uid.trim()!= "" && newVal[i].uid === uid )
+                ||  newVal[i].name.trim()!= "" && newVal[i].name === name){
               if(this.items[j].hasAttribute(this.selectedAttribute) != newVal[i].value){
                 this.select(name);
               }
