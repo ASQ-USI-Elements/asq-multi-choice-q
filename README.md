@@ -1,1 +1,1 @@
-## ASQ Multi-choice question element
+## `asq-multi-choice-q` question element

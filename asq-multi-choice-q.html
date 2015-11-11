@@ -1,257 +1,315 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../asq-option/asq-option.html">
-<link rel="import" href="../core-selector/core-selector.html">
-<link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../asq-base/asq-base.html">
 
+<link rel="import" href="elements/asq-multi-choice-q-viewer.html">
+<link rel="import" href="elements/asq-multi-choice-q-presenter.html">
+
 <!--
-`asq-multi-choice-q` is always contains many options which is able to be selected.
-It is possible to select many options or only one option by setting the 
-attribute `multi` to true or false.
+`asq-multi-choice-q` is used to define choice questions. It basically has two modes, single or multi, by setting the 
+`multi` attribute. Normally, `asq-multi-choice-q` is used with 
+`asq-option` together by default. However it can also be used with other elements by setting the `selectable` attribute.
 
-##### Example
-    <asq-multi-choice-q multi>
-      <asq-stem><h3>You can choose any number of options</h3></asq-stem>
-      <asq-option name="op0" selected>Option 1</asq-option>
-      <asq-option name="op1"         >Option 2</asq-option>
-      <asq-option name="op2"         >Option 3</asq-option>
-      <asq-option name="op3" selected>Option 4</asq-option>
+`asq-multi-choice-q` inherits the `Polymer.IronMultiSelectableBehavior` and adapts from `paper-radio-group`. 
+
+Examples:
+    
+    <asq-multi-choice-q selected="n" attr-for-selected="custom-name">
+      <asq-option custom-name="o">Oxygen</asq-option>
+      <asq-option custom-name="c">Carbon</asq-option>
+      <asq-option custom-name="h">Hydrogen</asq-option>
+      <asq-option custom-name="n">Nitrogen</asq-option>
+      <asq-option custom-name="ca">Calcium</asq-option>
     </asq-multi-choice-q>
 
+    <asq-multi-choice-q selected-values='["o", "c"]' multi attr-for-selected>
+      <asq-option name="o">Oxygen</asq-option>
+      <asq-option name="c">Carbon</asq-option>
+      <asq-option name="h">Hydrogen</asq-option>
+      <asq-option name="n">Nitrogen</asq-option>
+      <asq-option name="ca">Calcium</asq-option>
+    </asq-multi-choice-q> 
 
-    <asq-multi-choice-q selected="3">
-      <asq-stem><h3>Here you can pick just one option</h3></asq-stem>
-      <asq-option name="op0">Option 1</asq-option>
-      <asq-option name="op1">Option 2</asq-option>
-      <asq-option name="op2">Option 3</asq-option>
-      <asq-option name="op3">Option 4</asq-option>
-    </asq-multi-choice-q>
+To pre-select some options, you may use `selected` attribtue in single mode or `selected-values` in multi mode. Note that in multi mode, the value of `selected-values` should be a **valid JSON string**. That is instead of using `"['o', 'c']"`, you need to use `'["o", "c"]'`.
 
+In single mode, you can also use arrow keys to select option.
+    
 
-@element asq-multi-choice-q
+@element asq-asq-multi-choice-q
+@demo demo/index.html
 @group ASQ Elements
-@blurb Element acting as options in multichoice questions.
+@blurb ASQ choice questions.
 @homepage http://github.com/ASQ-USI-Elements/asq-multi-choice-q
 -->
-<polymer-element name="asq-multi-choice-q" extends="core-selector">
+<dom-module id="asq-multi-choice-q">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
   <template>
-    <style>
-      :host {
-        display: block;
-      }
+    <template is="dom-if" if="{{hasRole(role, roles.VIEWER)}}" restamp="true">
+      <asq-multi-choice-q-viewer 
+        role="viewer" 
+        uid="[[uid]]"
+        value="{{value}}"
+        multi="{{multi}}"
+        disabled="{{disabled}}"
+        attr-for-selected="{{attrForSelected}}"
+        selectable="{{selectable}}"
+        selected-class="{{selectedClass}}"
+        selected-attribute="{{selectedAttribute}}"
+        excluded-local-names="{{excludedLocalNames}}"
+        selected="{{selected}}"
+        selected-values="{{selectedValues}}"
+        event-bus="[[eventBus]]">
+        <content></content>
+      </asq-multi-choice-q-viewer>
+    </template>
 
-
-    </style>
-
-    <content select="asq-stem"></content>
-
-    <ol>
-      <shadow></shadow>
-    </ol>
-
-
+    <template is="dom-if" if="{{hasRole(role, roles.PRESENTER)}}" restamp="true">
+      <asq-multi-choice-q-presenter 
+        role="presenter" 
+        uid="[[uid]]"
+        value="{{value}}" 
+        multi="{{multi}}"
+        disabled="{{disabled}}"
+        attr-for-selected="{{attrForSelected}}"
+        selectable="{{selectable}}"
+        selected-class="{{selectedClass}}"
+        selected-attribute="{{selectedAttribute}}"
+        excluded-local-names="{{excludedLocalNames}}"
+        event-bus="[[eventBus]]">
+        <content></content>
+      </asq-multi-choice-q-presenter>
+    </template>
   </template>
-
   <script>
-  (function() {
-    var p = {
+    Polymer({ 
+      is: 'asq-multi-choice-q',
 
-      publish: {
+      behaviors: [
+        ASQ.asqQuestionElementBehavior
+      ],
+
+
+      properties: {
         /**
-         * Disable or endable this elements.
-         * 
-         * @attribute disabled
-         * @type boolean
-         * @default false
+         * The selected options.
          */
-        disabled: {value: false, reflect: true}, 
+        value: {
+          type: Object,
+          notify: true,
+          observer: "_valueChanged"
+        },
+
+        /**
+         * Disable or enable the element. Changes will be also
+         * propagated to inner propagated elements.
+         */
+        disabled: { 
+          type: Boolean,
+          value: false,
+          notify: true, 
+          reflectToAttribute: true
+        },
+        /**
+         * Overriden from Polymer.IronMultiSelectableBehavior
+         * Modification: set the `reflectToAttribute` field.
+         *
+         * Decide the mode, single or multi.
+         */
+        multi: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         *
+         *  If you want to use the attribute value of an element for `selected` or `selected-values` instead of the index, set this to the name of the attribute.
+         * 
+         */
+        attrForSelected: {
+          type: String,
+          value: 'name'
+        },
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         *
+         * The attribute to set on elements when selected.
+         */
+        selectedAttribute: {
+          type: String,
+          value: 'checked'
+        },
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         *
+         * This is a CSS selector sting.  If this is set, only items that matches the CSS selector are selectable.
+         */
+        selectable: {
+          type: String,
+          value: 'asq-option'
+        },
+
+        /**
+         * Overriden from Polymer.IronSelectableBehavior
+         * 
+         * The class to set on elements when selected.
+         *
+         * @attribute selectedClass
+         * @type {string}
+         */
+        selectedClass: {
+          type: String,
+          value: 'asq-selected'
+        },
+
+        _answers: {
+          type: Array,
+          notify: true
+        },
+
+        _initialized: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+
+        /**
+         * Gets or sets the selected element. The default is to use the index of the item.
+         *
+         * @attribute selected
+         * @type {string}
+         */
+        selected: {
+          type: String,
+          notify: true
+        },
+
+        selectedValues: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return []
+          }
+        },
+        /**
+         * Event bus to communicate with ASQ
+         */
+        eventBus: {
+          type: Object,
+          notify: true
+        }
       },
 
-      multiChanged: function() {
-        // console.log('multiChanged');
-        //make asq-option elements checkboxes or radio buttons
-        var inputType = ! this.multi
-          ? 'radio'
-          : 'checkbox';
+      /**
+       * A proxy that can interface with inner element.
+       */
+      api: undefined,
+
+
+      created: function () {
+        document.addEventListener('asq-ready', function (evt) {
+          this.eventBus = evt.detail.asqEventBus
+        }.bind(this));
+
+        this.listen(this, 'role-changed', '_onRoleChanged');
+        this.listen(this, 'asq-option-ready', '_onOptionReady');
+        this.listen(this, 'asq-initialized', '_onInitialized');
+      },
+
+      _onOptionReady: function() {
+        this._propagateRole(this.role);
+      },
+
+      attached: function() {
+        this.async(function() {
+          this._setApi();
+        })
+      },
+
+      _onRoleChanged: function() {
+        this._setApi();
+      },
+
+      _onInitialized: function() {
+        this._setApi();
+      },
+
+      _setApi: function() {
+        var selector = 'asq-multi-choice-q-' + this.role;
+        this.api = this.$$(selector);
+      },
 
       
-        this.getOptions().forEach(function(opt){
-          opt.type = inputType;
-        });
-      },
-
-      disabledChanged: function() {
-        for ( var x of this.getOptions() ) {
-          x.disabled = this.disabled;
-        }
-      },
-
-
       /**
-       * Return all the *asq-option* elements.
-       *
-       * @method getOptions
-       * @return array all the *asq-option* elements
-       */
-      getOptions: function() {
-        return this.childNodes.array().filter(function(el) {
-          return el.isASQElement && el.nodeName == "ASQ-OPTION";
-        });
-      },
-
-      /**
-       * If true, this question becomes multi-choices quesiton.
+       * Porxy of `toggle` in asq-multi-choice-q-viewer.
        * 
-       * @attribute multi
-       * @type boolean
-       * @default false
+       * Toggle the given value. By setting the `flag` you can make
+       * sure the give value is to be checked or not. If the `flag` is
+       * not specified, it behaves the same as `select` method.
        */
-      multi: false,
-
-      selectedAttribute: 'checked',
-
-      activateEvent: 'asq-change',
-
-      defaultExcludedLocalNames: 'asq-stem',
-
-      //
-      created: function(){
-        document.addEventListener('asq-ready', function(evt){
-          try {
-            this.subscribeToEvents(evt.detail.asqEventBus)
-          } catch(err){
-            console.debug('failed to subscribeToEvents');
-          }
-        }.bind(this));
-      },
-
-      onQuestionType: function(evt){
-        if(!evt || ! evt.questionType) return;
-
-        if(evt.questionType == 'asq-multi-choice-q'){
-          if(evt.type == "progress"){
-            this.onProgress(evt);
-          }else if(evt.type == "restorePresenter"){
-            if(this.role !== this.roles.PRESENTER) return;
-            this.onRestorePresenter(evt);
-          }
-          else if(evt.type == "restoreViewer"){
-            if(this.role !== this.roles.VIEWER) return;
-            this.onRestoreViewer(evt);
-          }
-        }
-      },
-
-      onRestorePresenter: function(evt){
-        evt.questions.forEach(function(q){
-          if(q.uid != this.uid) return;
-          var optionsDictionary = {};
-          q.data.options.forEach(function(option){
-            optionsDictionary[option.uid] = option.sum;
-          }.bind(this));
-          this.updateProgress(optionsDictionary, evt.total)
-        }.bind(this));
-      },
-
-      onRestoreViewer: function(evt){
-        evt.questions.forEach(function(q){
-          console.log(q)
-         if(q.uid != this.uid) return;
-          q.options.forEach(function(option){
-           this.updateOption(option._id, option.value);
-          }.bind(this));
-        }.bind(this));
-      },
-
-      updateOption: function(uid, val){
-        var opt = this.querySelector('asq-option[uid="' + uid + '"');
-        if(! opt){
-          console.log("Could not find option with uid %s", uid);
-          return;
-        }
-
-        opt.checked = val;
-      },
-
-      onProgress: function(evt){
-        if(evt.question.question !== this.uid) return;
-        if(this.role !== this.roles.PRESENTER) return;
-
-        var optionsDictionary = {};
-        evt.question.options.forEach(function(option){
-          optionsDictionary[option._id] = option.sum;
-        }.bind(this));
-        this.updateProgress(optionsDictionary, evt.total)
-      },
-
-      updateProgress: function(options, total){
-        total = total || 100;
-        for (var key in options){
-          if(options.hasOwnProperty(key)){
-            this.updateOptionProgress(key, options[key], total);
-          }
-        }
-      },
-
-      updateOptionProgress: function(uid, val, total){
-        var option = document.querySelector('asq-option[uid="'+ uid +'"]');
-        if(! option){
-          console.log('failed to updateOptionProgress, could not find option with uid %s', uid);
-          return;
-        }
-        var progressBar = option.shadowRoot.getElementById('progressBar');
-        progressBar.max = parseInt(total);
-        progressBar.value = parseInt(val);
-
-        var progressNum = option.shadowRoot.getElementById('progressNum');
-        progressNum.innerHTML = progressBar.value;
+      toggle: function(value, flag) {
+        if ( ! this.api || ! this.api.toggle ) return;
+        this.api.toggle(value, flag);
       },
 
       /**
-       * This question type is interested in two events: `asq:question_type`, which is emitted 
-       * when answer is submitted successfully.
-       *
+       * Porxy of `toggle` in asq-multi-choice-q-viewer.
+       * 
+       * Toggle the given value. 
+       * 
+       * Note, it will always set the item specified by `value` into 
+       * opposite state. That is either from `checked` to not checked or
+       * from not checked to `checked`.
+       * 
        */
-      subscribeToEvents: function(eventBus){
-        eventBus.on('asq:question_type', this.onQuestionType.bind(this));
+      select: function(value) {
+        if ( ! this.api || ! this.api.select ) return;
+        this.api.select(value);
       },
 
       /**
-       * The `submit` method returns an object that respresents the submission of this question. The object has the following structure:
+       * Clear all selections.
+       */
+      clear: function() {
+        if ( ! this.api || ! this.api.clear ) return;
+        this.api.clear();
+      },
 
-           {
-              questionUid: this.uid, 
-              timestamp: new Date(),
-              submission: [] 
-           }
-       * Only enabled when the `role` of the element is <b>viewer</b>.
+
+
+      /**
+       * Collect answers from inner `asq-option`s and orgnize them 
+       * into an object.
        *
-       * @method submit
+
+          {
+            uid: this.uid,
+            timestamp: new Date(),
+            options: options
+          }
+
        */
       submit: function() {
-        if ( this.role !== this.roles.VIEWER ) {
-          return;
+        if (this.role == this.roles.VIEWER) {
+          var el = this.$$('asq-multi-choice-q-viewer');
+          if (!el) {
+            throw new Error('submit(): expected asq-css-select-q-viewer element to exist');
+          }
+          return el.submit();
         }
-
-        var options = this.getOptions();
-
-        var submission = [];
-        options.forEach(function(elem, index) {
-          submission.push(elem.submit());
-        });   
-
-        return {
-          questionUid: this.uid,
-          timestamp: new Date(),
-          submission: submission
-        };
       },
 
-    }
-
-    ASQ.asqify(p, true);
-    Polymer('asq-multi-choice-q', p);
-
-  })();
+      _valueChanged:function(newVal, oldVal){
+        this.fire('questioninput', newVal)
+      }
+      
+    });
   </script>
-</polymer-element>
+</dom-module>
