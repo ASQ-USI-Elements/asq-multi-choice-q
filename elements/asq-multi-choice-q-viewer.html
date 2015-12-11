@@ -326,6 +326,7 @@ In single mode, you can also use arrow keys to select option.
        * 
        */
       select: function(value) {
+        if ( this.disabled ) return;
         Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, [value]);
         this.fire('asq-multi-choice-q-changed');
       },
