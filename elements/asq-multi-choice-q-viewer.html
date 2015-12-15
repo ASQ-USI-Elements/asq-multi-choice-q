@@ -459,7 +459,7 @@ In single mode, you can also use arrow keys to select option.
         evt.questions.forEach(function(q){
         if( q.uid != this.uid ) return;
           q.options.forEach(function(option){
-           this._updateOption(option._id, option.value);
+           this._updateOption(option.uid, option.value);
           }.bind(this));
         }.bind(this));
       },
