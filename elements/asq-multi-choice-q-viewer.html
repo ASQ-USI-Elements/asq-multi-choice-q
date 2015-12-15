@@ -346,6 +346,7 @@ In single mode, you can also use arrow keys to select option.
         if ( ! this.multi ) 
           return this.selected === value 
         else
+          if ( ! this.selectedValues ) this.selectedValues = [];
           return this.selectedValues.indexOf(value) >=0 
       },
 
