@@ -219,6 +219,7 @@ In single mode, you can also use arrow keys to select option.
 
       _onStatsToggleChange: function(evt, detail){
         this._showOptionsProgress(this.$.statsToggle.checked);
+        this._markCorrectOptions(this.$.statsToggle.checked);
       },
 
       _showOptionsProgress: function(val){
@@ -230,6 +231,14 @@ In single mode, you can also use arrow keys to select option.
             op.displayProgress = val;
           })
         });
+      },
+
+      _markCorrectOptions: function(shouldMark){
+        Polymer.dom(this.$.optionsContent).getDistributedNodes().forEach(function(op){
+          if(op.correct){
+            op.style.background = (shouldMark ? "#66BB6A" : "none");
+          }
+        })
       },
 
       _initOptions: function() {
@@ -365,6 +374,7 @@ In single mode, you can also use arrow keys to select option.
           var optionsDictionary = {};
           q.data.options.forEach(function(option){
             optionsDictionary[option.uid] = option.sum;
+            this._setOptionCorrectness(option);
           }.bind(this));
 
           this._updateProgress(optionsDictionary, evt.total)
@@ -397,6 +407,15 @@ In single mode, you can also use arrow keys to select option.
         }
         option.progressValue = value;
         option.progressMax = total;
+      },
+
+      _setOptionCorrectness: function(optionData){
+        var option = this._findOptionById(optionData.uid);
+        if(! option){
+          console.error('Failed to _setOptionCorrectness; could not find option with uid %s', optionData.uid);
+          return;
+        }
+        option.correct = optionData.correct;
       },
 
 
