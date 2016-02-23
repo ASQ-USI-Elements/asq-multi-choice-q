@@ -20,7 +20,7 @@
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.0.14",
     "iron-list": "polymerelements/iron-list#^1.1.5",
     "paper-styles": "PolymerElements/paper-styles#^1.0.12",
-    "paper-toggle-button": "PolymerElements/paper-toggle-button#1.0.11"
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.1.1"
   },
   "ignore": [
     "index.js",
