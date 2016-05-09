@@ -94,6 +94,15 @@
       <asq-option role="presenter" name="ca" class="blue" progress-value="10" progress-max="15">Calcium</asq-option>
     </asq-multi-choice-q>
 
+    <h4>A single mode <code>asq-multi-choice-q</code> question for presenter with vertical bar-chart.</h4>
+    <asq-multi-choice-q id="vStats" attr-for-selected="name" role="presenter" stats-layout="vertical">
+      <asq-option role="presenter" name="o" uid="o">Oxygen is absolutely necessary for life</asq-option>
+      <asq-option role="presenter" name="c" uid="c">Carbon</asq-option>
+      <asq-option role="presenter" name="h" uid="h">Hydrogen</asq-option>
+      <asq-option role="presenter" name="n" uid="n">Nitrogen</asq-option>
+      <asq-option role="presenter" name="ca" uid="ca">Calcium and something else make salt</asq-option>
+    </asq-multi-choice-q>
+
     
 
   <script>
@@ -116,6 +125,19 @@
         return el.localName.indexOf('asq-') != -1;
       } 
     };
+
+    document.addEventListener("WebComponentsReady", function(evt){
+      var asqmc = document.getElementById("vStats");
+      asqmcP = Polymer.dom(asqmc.root).querySelector('asq-multi-choice-q-presenter');
+      var progress = {
+        o : 1,
+        c : 15,
+        h : 15,
+        n : 15,
+        ca : 70
+      }
+      asqmcP._updateProgress(progress , 100)
+    })
   </script>
 
 
