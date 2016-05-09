@@ -5,6 +5,9 @@
 <link rel="import" href="../../iron-selector/iron-multi-selectable.html">
 <link rel="import" href="../../iron-list/iron-list.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<link rel="import" href="../../nvd3-elements/nvd3-discrete-bar.html">
 
 
 <!--
@@ -60,59 +63,57 @@ In single mode, you can also use arrow keys to select option.
   </style>
   <template>
     <content select="asq-stem"></content>
-    <paper-toggle-button id="statsToggle" on-iron-change="_onStatsToggleChange"></paper-toggle-button>
+    <paper-toggle-button id="statsToggle" checked="{{_shouldShowStats}}"></paper-toggle-button>
     <content id="optionsContent" select="asq-option"></content>
     <content ></content>
+    <nvd3-discrete-bar id="vbarchart" hidden$="[[_hideVerticalStats(statsLayout, _shouldShowStats)]]" height="400" data={{_vBarData}} auto-resize></nvd3-discrete-bar>
   </template>
   <script>
+  function getBaseLog(x, y) {
+  return Math.log(y) / Math.log(x);
+}
+
+    function tWrap(text, width) {
+      text.each(function() {
+        var text = d3.select(this),
+            words = text.text().trim().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            y = text.attr("y")  || 0,
+            dy = parseFloat(text.attr("dy")) || 0,
+            tspan = text.text(null).append("tspan")
+              .attr("x", 0)
+              .attr("y", y)
+              .attr("dy", dy + "em");
+        while (word = words.pop()) {
+          line.push(word);
+          tspan.text(line.join(" "));
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop();
+            tspan.text(line.join(" "));
+            line = [word];
+            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          }
+          // align center
+          var w = tspan.node().getComputedTextLength();
+          var tspanX = (parseFloat(width) / 2) - (w / 2);
+          tspan.attr("x", tspanX)
+        }
+      });
+    }
+
     Polymer({ 
       is: 'asq-multi-choice-q-presenter',
 
       behaviors: [
         Polymer.IronMultiSelectableBehavior,
         Polymer.IronA11yKeysBehavior,
+        Polymer.IronResizableBehavior,
         ASQ.asqQuestionElementBehavior
       ],
 
-
-      created: function() {
-        this.listen(this, 'role-changed', '_onRoleChanged');
-      },
-
-      // clear all selections when role has changed 
-      _onRoleChanged: function() {
-        if ( this._initialized ) {
-          this.clear();
-        }
-      },
-
-
-      attached: function() {
-        this._initialized = true;
-        Polymer.dom.flush();
-
-        // as domReady
-        // We have to do this to wait for the ready of lightdom elements.
-        // See details here: https://goo.gl/huOBKi
-        this.async(function() {
-          this._initOptions();
-          this._setOptions('disabled', this.disabled);
-          this._showOptionsProgress(this.$.statsToggle.checked);
-        });
-
-        this.fire('asq-initialized', {
-          is: this.is, 
-          which: this,
-          initialized: this._initialized
-        });
-
-        // TODO: temp solution before the pull request gets merged:
-        // https://github.com/PolymerElements/iron-selector/pull/64
-        this._removeListener(this.activateEvent);
-        this._addListener(this.activateEvent);  
-      },
-
-      
       properties: {
         /**
          * The selected options. Doesn't do anything in presenter right now.
@@ -187,18 +188,25 @@ In single mode, you can also use arrow keys to select option.
          */
         selectedClass: {
           type: String,
-          value: 'asq-selected'
+          value: 'asq-selected',
         },
 
         _answers: {
           type: Array,
-          notify: true
+          notify: true,
         },
 
         _initialized: {
           type: Boolean,
           value: false,
-          notify: true
+          notify: true,
+        },
+
+        _shouldShowStats:{
+          type: Boolean,
+          value: false,
+          notify: true,
+          observer: "_shouldShowStatsChanged"
         },
 
         selectedValues: {
@@ -206,20 +214,168 @@ In single mode, you can also use arrow keys to select option.
           notify: true,
           value: function() {
             return []
-          }
+          },
+        },
+
+        _vBarData: {
+          type: Array,
+          value: function(){
+            return [];
+          },
+          notify: true,
+          observer: "_vBarDataChanged"
+        },
+
+        /**
+        * display `horizontal` or `vertical` bar chart on the presenter.
+        */
+        statsLayout:{
+          type: String,
+          value: "horizontal",
+          notify: true,
+          observer: "_statsLayoutChanged",
+          reflectToAttribute:true
         },
 
         eventBus: {
           type: Object,
           observer: "_eventBusChanged",
-          notify: true
+          notify: true,
         },
 
       },
 
-      _onStatsToggleChange: function(evt, detail){
-        this._showOptionsProgress(this.$.statsToggle.checked);
-        this._markCorrectOptions(this.$.statsToggle.checked);
+      listeners: {
+        'iron-resize': '_onResize'
+      },
+
+
+      created: function() {
+        this.listen(this, 'role-changed', '_onRoleChanged');
+      },
+
+      _onResize: function(){
+        if(this.statsLayout !== "vertical" || this._shouldShowStats === false ) return;
+        this._refreshVBarChart();
+      },
+
+      // clear all selections when role has changed 
+      _onRoleChanged: function() {
+        if ( this._initialized ) {
+          this.clear();
+        }
+      },
+
+
+      attached: function() {
+        this._initialized = true;
+        Polymer.dom.flush();
+
+        // fixme(triglian): somehow the svg doesn't stress when inside an impress.js presentation
+        // in the demo.html it stretches normally
+        this.$.vbarchart.svg.style.width = "100%";
+        this.$.vbarchart.svg.style.height = "100%";
+
+        // patch _chart property which is reused on every drawing
+        // to hide x axis
+        this.$.vbarchart._chart = this.$.vbarchart._chart.showXAxis(false)
+
+        // as domReady
+        // We have to do this to wait for the ready of lightdom elements.
+        // See details here: https://goo.gl/huOBKi
+        this.async(function() {
+          this._initOptions();
+          this._setOptions('disabled', this.disabled);
+          this._showStats(this.$.statsToggle.checked);
+        });
+
+        this.fire('asq-initialized', {
+          is: this.is, 
+          which: this,
+          initialized: this._initialized
+        });
+
+        // TODO: temp solution before the pull request gets merged:
+        // https://github.com/PolymerElements/iron-selector/pull/64
+        this._removeListener(this.activateEvent);
+        this._addListener(this.activateEvent);  
+      },
+
+      _shouldShowStatsChanged: function(newVal, oldVal){
+        this._showStats(newVal);
+        this._markCorrectOptions(newVal);
+      },
+
+      _showStats: function(show){
+        if(this.statsLayout !== "vertical"){
+          return this._showOptionsProgress(show);
+        }else{
+          this._setOptions('hidden', show);
+          show && this._refreshVBarChart()
+        }
+      },
+
+      _refreshVBarChart: function(){
+        this.$.vbarchart.generateChart();
+        this._drawLabelsInVBarChart();
+      },
+
+      _vBarDataChanged: function(){
+        if(this.statsLayout !== "vertical" || this._shouldShowStats === false ) return;
+        this._refreshVBarChart();
+      },
+
+      _drawLabelsInVBarChart: function(){
+        this.async(function(){
+          d3.select(this.$.vbarchart.svg).selectAll('.nv-discretebar .nv-group').each(function(group){
+            var g = d3.select(this);
+            
+            // Remove previous labels if there is any
+            g.selectAll('text').remove();
+            g.selectAll('.nv-bar').each(function(bar){
+              var b = d3.select(this)
+              var db = d3.select(this).select(".discreteBar");
+              var barWidth = db.attr('width');
+              var barHeight = db.attr('height');
+
+              b.append('text')
+                // Transforms shift the origin point then the x and y of the bar
+                // is altered by this transform. In order to align the labels
+                // we need to apply this transform to those.
+                // .attr('transform', b.attr('transform'))
+                .text(function(){
+                  // Two decimals format
+                  return bar.label
+                })
+                .style('fill', 'rgb(0, 0, 0, 1)')
+                .style('stroke', 'rgb(0, 0, 0, 0)')
+                .style('font-size', (0.40* getBaseLog(5, barWidth - 50)) + "em")
+                .call(tWrap, barWidth)
+                .attr('dy', 0)
+                // .attr('y', 0)
+                .attr('x', 0)
+                .attr('y', function(){
+                  // Center label vertically
+                  var height = this.getBBox().height + 10;
+                  if(barHeight < height){
+                    return - (height - 10)
+                  }
+                  return 30; // 10 is the label's margin from the bar
+                })
+                .attr('class', 'bar-labels')
+                .selectAll('tspan').each(function(tspan){
+                  d3.select(this).attr("y", d3.select(this.parentNode).attr("y"))
+                })
+
+                // .attr('x', function(){
+                //   // Center label horizontally
+                //   var width = this.getBBox().width;
+                //   return (parseFloat(barWidth) / 2) - (width / 2);
+                // })
+                
+            });
+          });
+        },300);
       },
 
       _showOptionsProgress: function(val){
@@ -227,14 +383,14 @@ In single mode, you can also use arrow keys to select option.
         // We have to do this to wait for the ready of lightdom elements.
         // See details here: https://goo.gl/huOBKi
         this.async(function() {
-          Polymer.dom(this.$.optionsContent).getDistributedNodes().forEach(function(op){
+          this.items.forEach(function(op){
             op.displayProgress = val;
           })
         });
       },
 
       _markCorrectOptions: function(shouldMark){
-        Polymer.dom(this.$.optionsContent).getDistributedNodes().forEach(function(op){
+        this.items.forEach(function(op){
           if(op.correct){
             op.style.background = (shouldMark ? "#66BB6A" : "none");
           }
@@ -334,6 +490,12 @@ In single mode, you can also use arrow keys to select option.
         eventBus.on('asq:question_type', this._onQuestionType.bind(this));
       },
 
+      _statsLayoutChanged: function(newL, oldL){
+        if(newL == oldL) return;
+
+        return this._showStats(this._shouldShowStats);
+      },
+
 
       _onQuestionType: function(evt){
         if (!evt || ! evt.questionType) return;
@@ -383,11 +545,28 @@ In single mode, you can also use arrow keys to select option.
 
       _updateProgress: function(options, total){
         total = total || 100;
-        for (var key in options){
-          if(options.hasOwnProperty(key)){
-            this._updateOptionProgress(key, options[key], total);
+        //simultaneously update nv3d and asq-options 
+        var data = Object.keys(options).map(function(key){
+          var opt = this._updateOptionProgress(key, options[key], total);
+          var pOpt = Polymer.dom(opt.root).querySelector("asq-option-presenter");
+          var txt = opt.textContent//pOpt.$.label.textContent;
+          return {
+            label: txt,
+            value: options[key] || 0
           }
-        }
+        }.bind(this))
+
+        this._vBarData = [{
+          key: "test",
+          values: data
+        }]
+
+        
+        // for (var key in options){
+        //   if(options.hasOwnProperty(key)){
+        //     this._updateOptionProgress(key, options[key], total);
+        //   }
+        // }
       },
 
       // zhenfei: may use ECMA 6 Array.prototype.find instead ?
@@ -407,6 +586,7 @@ In single mode, you can also use arrow keys to select option.
         }
         option.progressValue = value;
         option.progressMax = total;
+        return option;
       },
 
       _setOptionCorrectness: function(optionData){
@@ -427,6 +607,10 @@ In single mode, you can also use arrow keys to select option.
           return;
         }
         this.toggle(option.getAttribute(this.attrForSelected), value);
+      },
+
+      _hideVerticalStats: function(statsLayout, showStats){
+        return statsLayout === "horizontal" || showStats === false;
       }
       
     });

@@ -78,6 +78,7 @@ In single mode, you can also use arrow keys to select option.
         selected-class="{{selectedClass}}"
         selected-attribute="{{selectedAttribute}}"
         excluded-local-names="{{excludedLocalNames}}"
+        stats-layout="{{statsLayout}}"
         event-bus="[[eventBus]]">
         <content></content>
       </asq-multi-choice-q-presenter>
@@ -198,6 +199,17 @@ In single mode, you can also use arrow keys to select option.
             return []
           }
         },
+
+        /**
+        * display `horizontal` or `vertical` bar chart on the presenter.
+        */
+        statsLayout:{
+          type: String,
+          value: "horizontal",
+          notify: true,
+          reflectToAttribute:true
+        },
+        
         /**
          * Event bus to communicate with ASQ
          */
