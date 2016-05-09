@@ -79,6 +79,9 @@ In single mode, you can also use arrow keys to select option.
         selected-attribute="{{selectedAttribute}}"
         excluded-local-names="{{excludedLocalNames}}"
         stats-layout="{{statsLayout}}"
+        vstats-height = "{{vstatsHeight}}"
+        vstats-width = "{{vstatsWidth}}"
+        vstats-label-font-size = "{{vstatsLabelFontSize}}"
         event-bus="[[eventBus]]">
         <content></content>
       </asq-multi-choice-q-presenter>
@@ -208,6 +211,33 @@ In single mode, you can also use arrow keys to select option.
           value: "horizontal",
           notify: true,
           reflectToAttribute:true
+        },
+
+        /**
+        * The height of the nv3d bar chart in pixels. Only used when `statsLayout="vertical"`
+        * Default: The height of the container element.
+        */
+        vstatsHeight:{
+          type: Number,
+          value: 400
+        },
+
+        /**
+        * The width of the nv3d bar chart in pixels. Only used when `statsLayout="vertical"`
+        * Default: The width of the container element.
+        */
+        vstatsWidth:{
+          type: Number
+        },
+
+        /**
+        * The base font-size for the labels. Important: this doesn't match the final size
+        * which is calculated by taking into account the base font-size and the width of
+        * the bars.
+        */
+        vstatsLabelFontSize:{
+          type: String,
+          value: "inherit"
         },
         
         /**

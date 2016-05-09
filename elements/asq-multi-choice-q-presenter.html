@@ -66,7 +66,14 @@ In single mode, you can also use arrow keys to select option.
     <paper-toggle-button id="statsToggle" checked="{{_shouldShowStats}}"></paper-toggle-button>
     <content id="optionsContent" select="asq-option"></content>
     <content ></content>
-    <nvd3-discrete-bar id="vbarchart" hidden$="[[_hideVerticalStats(statsLayout, _shouldShowStats)]]" height="400" data={{_vBarData}} auto-resize></nvd3-discrete-bar>
+    <nvd3-discrete-bar 
+      id="vbarchart"
+      hidden$="[[_hideVerticalStats(statsLayout, _shouldShowStats)]]"
+      height="{{vstatsHeight}}"
+      width="{{vstatsWidth}}"
+      data={{_vBarData}}
+      auto-resize>
+    </nvd3-discrete-bar>
   </template>
   <script>
   function getBaseLog(x, y) {
@@ -237,6 +244,33 @@ In single mode, you can also use arrow keys to select option.
           reflectToAttribute:true
         },
 
+        /**
+        * The height of the nv3d bar chart in pixels. Only used when `statsLayout="vertical"`
+        * Default: The height of the container element.
+        */
+        vstatsHeight:{
+          type: Number,
+          value: 400
+        },
+
+        /**
+        * The width of the nv3d bar chart in pixels. Only used when `statsLayout="vertical"`
+        * Default: The width of the container element.
+        */
+        vstatsWidth:{
+          type: Number
+        },
+
+        /**
+        * The base font-size for the labels. Important: this doesn't match the final size
+        * which is calculated by taking into account the base font-size and the width of
+        * the bars
+        */
+        vstatsLabelFontSize:{
+          type: String,
+          value: "inherit"
+        },
+
         eventBus: {
           type: Object,
           observer: "_eventBusChanged",
@@ -271,6 +305,8 @@ In single mode, you can also use arrow keys to select option.
         this._initialized = true;
         Polymer.dom.flush();
 
+        this.$.vbarchart.style.fontSize = this.vstatsLabelFontSize;
+
         // fixme(triglian): somehow the svg doesn't stress when inside an impress.js presentation
         // in the demo.html it stretches normally
         this.$.vbarchart.svg.style.width = "100%";
@@ -278,7 +314,9 @@ In single mode, you can also use arrow keys to select option.
 
         // patch _chart property which is reused on every drawing
         // to hide x axis
-        this.$.vbarchart._chart = this.$.vbarchart._chart.showXAxis(false)
+        this.$.vbarchart._chart = this.$.vbarchart._chart.showXAxis(false);
+        // only show integer y axis numbers
+        this.$.vbarchart._chart.yAxis.tickFormat(d3.format(',.0d'));
 
         // as domReady
         // We have to do this to wait for the ready of lightdom elements.
