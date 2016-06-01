@@ -583,8 +583,16 @@ In single mode, you can also use arrow keys to select option.
 
       _updateProgress: function(options, total){
         total = total || 100;
-        //simultaneously update nv3d and asq-options 
-        var data = Object.keys(options).map(function(key){
+        //simultaneously update nv3d and asq-options
+
+        // we will use the local ordering of options but first we need to check
+        // that they match the database 
+        var domOpts =  this.items.map(function(el){ return el.uid});
+        if(domOpts.slice().sort().join(',')!== Object.keys(options).sort().join(',')){
+          throw Error("remote options don't match local options")
+        }
+
+        var data = domOpts.map(function(key){
           var opt = this._updateOptionProgress(key, options[key], total);
           var pOpt = Polymer.dom(opt.root).querySelector("asq-option-presenter");
           var txt = opt.textContent//pOpt.$.label.textContent;
