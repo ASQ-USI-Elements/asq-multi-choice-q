@@ -458,6 +458,11 @@ In single mode, you can also use arrow keys to select option.
         eventBus.on('asq:question_type', this._onQuestionType.bind(this));
       },
 
+      _resetHint: function(){
+        this.hint = '';
+        this.$.hint.classList.remove('active', 'correct', 'incorrect');
+      },
+
       _onQuestionType: function(evt){
         if (!evt || ! evt.questionType) return;
         if ( this.items.length === 0 ) return;
@@ -498,6 +503,8 @@ In single mode, you can also use arrow keys to select option.
            this._updateOption(option.uid, option.value);
           }.bind(this));
 
+          this._resetHint();
+
           if(ownAnswer.isSubmissionCorrect){
             this.hint = 'Correct.'
             this.$.hint.classList.add('active', 'correct');
@@ -511,6 +518,8 @@ In single mode, you can also use arrow keys to select option.
       _onSelfProgress: function(evt){
         if(evt.question.uid != this.uid) return;
 
+        this._resetHint();
+        
         if(evt.question.answer.isSubmissionCorrect){
           this.hint = 'Correct.'
           this.$.hint.classList.add('active', 'correct');
@@ -523,6 +532,8 @@ In single mode, you can also use arrow keys to select option.
 
       _onShowHintQuizTimedOut: function(evt){
         if(evt.question.uid != this.uid) return;
+
+        this._resetHint();
 
         if(evt.question.data.hint){
           this.hint = 'Sorry - time ran out. ' + evt.question.data.hint;
