@@ -48,10 +48,34 @@ In single mode, you can also use arrow keys to select option.
       display: block;
     }
 
+    #hint{
+        display: none;
+        @apply(--asq-hint);
+        @apply(--asq-multi-choice-q-hint);
+      }
+
+      #hint.active{
+        display: block;
+        @apply(--asq-hint-active);
+        @apply(--asq-multi-choice-q-hint-active);
+      }
+
+      #hint.correct{
+        display: block;
+        @apply(--asq-hint-correct);
+        @apply(--asq-multi-choice-q-hint-correct);
+      }
+
+      #hint.incorrect{
+        display: block;
+        @apply(--asq-hint-incorrect);
+        @apply(--asq-multi-choice-q-hint-incorrect);
+      }
   </style>
   <template>
     <content select="asq-stem"></content>
     <content id="items" select="*"></content>
+     <asq-hint id="hint" inner-h-t-m-l="[[hint]]"></asq-hint>
   </template>
   <script>
     Polymer({ 
@@ -438,8 +462,16 @@ In single mode, you can also use arrow keys to select option.
         if (!evt || ! evt.questionType) return;
         if ( this.items.length === 0 ) return;
         if ( evt.questionType == 'asq-multi-choice-q' ) {
-          if(evt.type == 'restoreViewer'){
-            this._onRestoreViewer(evt);
+          switch(evt.type){
+            case 'restoreViewer':
+              this._onRestoreViewer(evt);
+              break;
+            case 'self-progress':
+              this._onSelfProgress(evt);
+              break;
+            case 'show-hint-quiztimedout':
+              this._onShowHintQuizTimedOut(evt);
+              break;
           }
         }
       },
@@ -453,16 +485,50 @@ In single mode, you can also use arrow keys to select option.
         }
       },
 
-      
       _onRestoreViewer: function(evt){
         if ( !evt.questions ) return;
         
         evt.questions.forEach(function(q){
-        if( q.uid != this.uid ) return;
-          q.options.forEach(function(option){
+          if( q.uid != this.uid ) return;
+
+          var ownAnswer = q.ownAnswer;
+          if(typeof q.ownAnswer === 'undefined') return;
+
+          ownAnswer.options.forEach(function(option){
            this._updateOption(option.uid, option.value);
           }.bind(this));
+
+          if(ownAnswer.isSubmissionCorrect){
+            this.hint = 'Correct.'
+            this.$.hint.classList.add('active', 'correct');
+          }else if(! ownAnswer.isSubmissionCorrect && q.data.hint){
+            this.hint = 'Incorrect.' +  q.data.hint;
+            this.$.hint.classList.add('active', 'incorrect');
+          }
         }.bind(this));
+      },
+
+      _onSelfProgress: function(evt){
+        if(evt.question.uid != this.uid) return;
+
+        if(evt.question.answer.isSubmissionCorrect){
+          this.hint = 'Correct.'
+          this.$.hint.classList.add('active', 'correct');
+        }else if(! evt.question.answer.isSubmissionCorrect && evt.question.data.hint){
+          this.hint = 'Incorrect.' +  evt.question.data.hint;
+          this.$.hint.classList.add('active', 'incorrect');
+        }
+        this.fire('self-progress', evt);
+      },
+
+      _onShowHintQuizTimedOut: function(evt){
+        if(evt.question.uid != this.uid) return;
+
+        if(evt.question.data.hint){
+          this.hint = 'Sorry - time ran out. ' + evt.question.data.hint;
+          this.$.hint.classList.add('active', 'incorrect');
+        }
+        this.fire('show-hint-quiztimedout', evt);
       },
 
       // value is boolean, meaning checked or not.
