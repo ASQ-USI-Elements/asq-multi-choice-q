@@ -275,7 +275,7 @@ In single mode, you can also use arrow keys to select option.
         /**
          * The number of element that will be shown in the graph, without scrolling.
          */
-        vstatsDisplayedElements: {
+        vstatsNumDisplayedElements: {
           type: Number,
           value: 10
         },
@@ -641,9 +641,12 @@ In single mode, you can also use arrow keys to select option.
 
         var data = [];
 
+
         allUids.forEach(function (key) {
+          //updating each option content
           var opt = this._updateOptionProgress(key, options[key], total, others[key]);
 
+          // put the the content of the options in data and feed it to the vertical histogram (line 670)
           var txt, value;
           if(opt.otherData){
             opt.otherData.forEach(function (el) {
@@ -659,9 +662,10 @@ In single mode, you can also use arrow keys to select option.
 
         }.bind(this));
 
-        var cWidth = 100/this.vstatsDisplayedElements;
+        // dinamically changes the width of the 'stats-nested-wrapper' element
+        var cWidth = 100/this.vstatsNumDisplayedElements;
         Polymer.dom(this.root).querySelector('div[id=stats-nested-wrapper]')
-          .style.width = data.length > this.vstatsDisplayedElements? data.length*cWidth+"%" : "100%";
+          .style.width = data.length > this.vstatsNumDisplayedElements? data.length*cWidth+"%" : "100%";
 
         this._vBarData = [{
           key: "test",

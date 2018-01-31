@@ -2,7 +2,11 @@
   "name": "asq-multi-choice-q",
   "version": "0.2.1",
   "description": "Multi-choice question type for ASQ.",
-  "author": "Zhenfei Nie <zhen.fei.nie@usi.ch>, Vassilis Triglianos <triglian@gmail.com>, Gustavo Graziani <gustavo.graz@outlook.com>",
+  "author": "Vassilis Triglianos <triglian@gmail.com>",
+  "contributors": [
+    "Zhenfei Nie <zhen.fei.nie@usi.ch>",
+    "Gustavo Graziani <gustavo.graz@outlook.com>"
+  ],
   "homepage": "https://github.com/ASQ-USI-Elements/asq-multi-choice-q",
   "main": "index.js",
   "repository": {
