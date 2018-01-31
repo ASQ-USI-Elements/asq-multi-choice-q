@@ -60,25 +60,36 @@ In single mode, you can also use arrow keys to select option.
       position:relative;
       @apply(--asq-multi-choice-stats-toggle);
     }
+
+    #stats-wrapper {
+      position: relative;
+      overflow-x: scroll;
+      width: 100%;
+    }
+
   </style>
   <template>
     <content select="asq-stem"></content>
     <paper-toggle-button id="statsToggle" checked="{{_shouldShowStats}}"></paper-toggle-button>
     <content id="optionsContent" select="asq-option"></content>
     <content ></content>
-    <nvd3-discrete-bar 
-      id="vbarchart"
-      hidden$="[[_hideVerticalStats(statsLayout, _shouldShowStats)]]"
-      height="{{vstatsHeight}}"
-      width="{{vstatsWidth}}"
-      data={{_vBarData}}
-      auto-resize>
-    </nvd3-discrete-bar>
+    <div id="stats-wrapper">
+      <div id="stats-nested-wrapper">
+        <nvd3-discrete-bar
+                id="vbarchart"
+                hidden$="[[_hideVerticalStats(statsLayout, _shouldShowStats)]]"
+                height="{{vstatsHeight}}"
+                width="{{vstatsWidth}}"
+                data={{_vBarData}}
+                auto-resize>
+        </nvd3-discrete-bar>
+      </div>
+    </div>
   </template>
   <script>
-  function getBaseLog(x, y) {
-  return Math.log(y) / Math.log(x);
-}
+    function getBaseLog(x, y) {
+      return Math.log(y) / Math.log(x);
+    }
 
     function tWrap(text, width) {
       text.each(function() {
@@ -259,6 +270,14 @@ In single mode, you can also use arrow keys to select option.
         */
         vstatsWidth:{
           type: Number
+        },
+
+        /**
+         * The number of element that will be shown in the graph, without scrolling.
+         */
+        vstatsDisplayedElements: {
+          type: Number,
+          value: 10
         },
 
         /**
@@ -522,7 +541,6 @@ In single mode, you can also use arrow keys to select option.
       },
 
 
-
       _eventBusChanged: function (eventBus) {
         if(!eventBus) return;
         eventBus.on('asq:question_type', this._onQuestionType.bind(this));
@@ -562,7 +580,21 @@ In single mode, you can also use arrow keys to select option.
           optionsDictionary[option.uid] = option.sum;
         }.bind(this));
 
-        this._updateProgress(optionsDictionary, evt.total)
+        var othersDictionary = {};
+        evt.question.options.forEach(function (option) {
+          if(option.otherData){
+            var keys = Object.keys(option.otherData);
+            var data = [];
+            keys.forEach(function(k){
+              data.push({'text' : k, 'num' : option.otherData[k]})
+            });
+
+            othersDictionary[option.uid] = data
+
+          }
+        }.bind(this));
+
+        this._updateProgress(optionsDictionary, evt.total, othersDictionary)
       },
 
       _onRestorePresenter: function(evt){
@@ -577,42 +609,64 @@ In single mode, you can also use arrow keys to select option.
             this._setOptionCorrectness(option);
           }.bind(this));
 
-          this._updateProgress(optionsDictionary, evt.total)
+          var othersDictionary = {};
+          q.data.options.forEach(function (option) {
+            if(option.otherData){
+              var keys = Object.keys(option.otherData);
+              var data = [];
+              keys.forEach(function(k){
+                data.push({'text' : k, 'num' : option.otherData[k]})
+              });
+
+              othersDictionary[option.uid] = data
+            }
+          }.bind(this));
+
+          this._updateProgress(optionsDictionary, evt.total, othersDictionary)
         }.bind(this));
       },
 
-      _updateProgress: function(options, total){
+      _updateProgress: function (options, total, others) {
         total = total || 100;
         //simultaneously update nv3d and asq-options
 
         // we will use the local ordering of options but first we need to check
-        // that they match the database 
-        var domOpts =  this.items.map(function(el){ return el.uid});
-        if(domOpts.slice().sort().join(',')!== Object.keys(options).sort().join(',')){
+        // that they match the database
+        var allUids = this.items.map(function (el) {
+          return el.uid
+        });
+        if (allUids.slice().sort().join(',') !== Object.keys(options).sort().join(',')) {
           throw Error("remote options don't match local options")
         }
 
-        var data = domOpts.map(function(key){
-          var opt = this._updateOptionProgress(key, options[key], total);
-          var pOpt = Polymer.dom(opt.root).querySelector("asq-option-presenter");
-          var txt = opt.textContent//pOpt.$.label.textContent;
-          return {
-            label: txt,
-            value: options[key] || 0
+        var data = [];
+
+        allUids.forEach(function (key) {
+          var opt = this._updateOptionProgress(key, options[key], total, others[key]);
+
+          var txt, value;
+          if(opt.otherData){
+            opt.otherData.forEach(function (el) {
+              txt = el.text;
+              value = el.num;
+              data.push({ label: txt, value: value });
+            });
+          } else {
+            txt = opt.textContent;
+            value = options[key] || 0;
+            data.push({ label: txt, value: value });
           }
-        }.bind(this))
+
+        }.bind(this));
+
+        var cWidth = 100/this.vstatsDisplayedElements;
+        Polymer.dom(this.root).querySelector('div[id=stats-nested-wrapper]')
+          .style.width = data.length > this.vstatsDisplayedElements? data.length*cWidth+"%" : "100%";
 
         this._vBarData = [{
           key: "test",
           values: data
         }]
-
-        
-        // for (var key in options){
-        //   if(options.hasOwnProperty(key)){
-        //     this._updateOptionProgress(key, options[key], total);
-        //   }
-        // }
       },
 
       // zhenfei: may use ECMA 6 Array.prototype.find instead ?
@@ -624,7 +678,7 @@ In single mode, you can also use arrow keys to select option.
         }
       },
 
-      _updateOptionProgress: function(uid, value, total){
+      _updateOptionProgress: function(uid, value, total, other){
         var option = this._findOptionById(uid);
         if(! option){
           console.error('Failed to updateOptionProgress; could not find option with uid %s', uid);
@@ -632,6 +686,9 @@ In single mode, you can also use arrow keys to select option.
         }
         option.progressValue = value;
         option.progressMax = total;
+        if(option.isOther && other){
+          option.otherData = other;
+        }
         return option;
       },
 

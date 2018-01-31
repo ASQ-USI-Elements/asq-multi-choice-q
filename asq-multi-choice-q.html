@@ -81,6 +81,7 @@ In single mode, you can also use arrow keys to select option.
         stats-layout="{{statsLayout}}"
         vstats-height = "{{vstatsHeight}}"
         vstats-width = "{{vstatsWidth}}"
+        vstats-displayed-elements = "{{vstatsDisplayedElements}}"
         vstats-label-font-size = "{{vstatsLabelFontSize}}"
         event-bus="[[eventBus]]">
         <content></content>
@@ -228,6 +229,14 @@ In single mode, you can also use arrow keys to select option.
         */
         vstatsWidth:{
           type: Number
+        },
+
+        /**
+         * The number of element that will be shown in the graph, without scrolling.
+         */
+        vstatsDisplayedElements: {
+          type: Number,
+          value: 10
         },
 
         /**
