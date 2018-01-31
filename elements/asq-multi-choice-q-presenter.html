@@ -643,7 +643,7 @@ In single mode, you can also use arrow keys to select option.
 
 
         allUids.forEach(function (key) {
-          //updating each option content
+          // updating each option content
           var opt = this._updateOptionProgress(key, options[key], total, others[key]);
 
           // put the the content of the options in data and feed it to the vertical histogram (line 670)
@@ -662,7 +662,7 @@ In single mode, you can also use arrow keys to select option.
 
         }.bind(this));
 
-        // dinamically changes the width of the 'stats-nested-wrapper' element
+        // dynamically changes the width of the 'stats-nested-wrapper' element
         var cWidth = 100/this.vstatsNumDisplayedElements;
         Polymer.dom(this.root).querySelector('div[id=stats-nested-wrapper]')
           .style.width = data.length > this.vstatsNumDisplayedElements? data.length*cWidth+"%" : "100%";
