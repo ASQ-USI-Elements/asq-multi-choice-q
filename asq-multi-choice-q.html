@@ -5,28 +5,43 @@
 <link rel="import" href="elements/asq-multi-choice-q-presenter.html">
 
 <!--
-`asq-multi-choice-q` is used to define choice questions. It basically has two modes, single or multi, by setting the 
-`multi` attribute. Normally, `asq-multi-choice-q` is used with 
-`asq-option` together by default. However it can also be used with other elements by setting the `selectable` attribute.
+`asq-multi-choice-q` is used to define choice questions. It support selecting both a single option or multiple options by setting the 
+`multi` attribute. 
+
+If you want users to provide an "other" option where they can also provide additional text set the `is-other` attribute on an `asq-option` element.
+
+`asq-multi-choice-q` is built to be used with 
+`asq-option` elements. However, it can also be used with other elements by setting the `selectable` attribute.
 
 `asq-multi-choice-q` inherits the `Polymer.IronMultiSelectableBehavior` and adapts from `paper-radio-group`. 
 
 Examples:
     
     <asq-multi-choice-q selected="n" attr-for-selected="custom-name">
+      <asq-stem>What element is the basis of organic compounds?</asq-stem>
       <asq-option custom-name="o">Oxygen</asq-option>
-      <asq-option custom-name="c">Carbon</asq-option>
+      <asq-option custom-name="c" correct>Carbon</asq-option>
       <asq-option custom-name="h">Hydrogen</asq-option>
       <asq-option custom-name="n">Nitrogen</asq-option>
       <asq-option custom-name="ca">Calcium</asq-option>
     </asq-multi-choice-q>
 
-    <asq-multi-choice-q selected-values='["o", "c"]' multi attr-for-selected>
-      <asq-option name="o">Oxygen</asq-option>
+    <asq-multi-choice-q selected-values='["o", "c"]' multi>
+      <asq-stem>Which of the following elements are in gas form in normal conditions?</asq-stem>
+      <asq-option name="o" correct>Oxygen</asq-option>
       <asq-option name="c">Carbon</asq-option>
-      <asq-option name="h">Hydrogen</asq-option>
-      <asq-option name="n">Nitrogen</asq-option>
+      <asq-option name="h" correct>Hydrogen</asq-option>
+      <asq-option name="n" correct>Nitrogen</asq-option>
       <asq-option name="ca">Calcium</asq-option>
+    </asq-multi-choice-q> 
+
+    <asq-multi-choice-q>
+      <asq-stem>What is your favorite Ramones song?</asq-stem>
+      <asq-option name="a">Blitzkrieg Bop</asq-option>
+      <asq-option name="b">Pet Sematary</asq-option>
+      <asq-option name="cs">Sheena is a Punk Rocker</asq-option>
+      <asq-option name="d">I don't know I just wear the t-shirt because it looks cool</asq-option>
+      <asq-option is-other name="other">Other</asq-option>
     </asq-multi-choice-q> 
 
 To pre-select some options, you may use `selected` attribtue in single mode or `selected-values` in multi mode. Note that in multi mode, the value of `selected-values` should be a **valid JSON string**. That is instead of using `"['o', 'c']"`, you need to use `'["o", "c"]'`.
@@ -81,6 +96,7 @@ In single mode, you can also use arrow keys to select option.
         stats-layout="{{statsLayout}}"
         vstats-height = "{{vstatsHeight}}"
         vstats-width = "{{vstatsWidth}}"
+        vstats-num-displayed-elements = "{{vstatsNumDisplayedElements}}"
         vstats-label-font-size = "{{vstatsLabelFontSize}}"
         event-bus="[[eventBus]]">
         <content></content>
@@ -228,6 +244,14 @@ In single mode, you can also use arrow keys to select option.
         */
         vstatsWidth:{
           type: Number
+        },
+
+        /**
+         * The number of element that will be shown in the graph, without scrolling.
+         */
+        vstatsNumDisplayedElements: {
+          type: Number,
+          value: 10
         },
 
         /**

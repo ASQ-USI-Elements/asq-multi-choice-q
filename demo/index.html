@@ -70,11 +70,12 @@
       <asq-option name="h">Hydrogen</asq-option>
       <asq-option name="n">Nitrogen</asq-option>
       <asq-option name="ca">Calcium</asq-option>
+      <asq-option name="other" is-other other-required>Other</asq-option>
     </asq-multi-choice-q>
 
     <hr>
 
-    <h4>A single mode <code>asq-multi-choice-q</code> question for viewer.</h4>
+    <h4>A single mode <code>asq-multi-choice-q</code> question for viewer with a custom attribute for the selected property.</h4>
     <asq-multi-choice-q selected="n" attr-for-selected="custom-name">
       <asq-option custom-name="o">Oxygen</asq-option>
       <asq-option custom-name="c">Carbon</asq-option>
@@ -85,6 +86,18 @@
 
     <hr>
 
+    <h4>A single mode <code>asq-multi-choice-q</code> question for viewer with an optional "other option".</h4>
+    <asq-multi-choice-q>
+      <asq-stem>What is your favorite Ramones song?</asq-stem>
+      <asq-option name="a">Blitzkrieg Bop</asq-option>
+      <asq-option name="b">Pet Sematary</asq-option>
+      <asq-option name="cs">Sheena is a Punk Rocker</asq-option>
+      <asq-option name="d">I don't know I just wear the t-shirt because it looks cool</asq-option>
+      <asq-option is-other name="other">Other</asq-option>
+    </asq-multi-choice-q> 
+
+    <hr>
+
     <h4>A single mode <code>asq-multi-choice-q</code> question for presenter.</h4>
     <asq-multi-choice-q attr-for-selected="name" role="presenter">
       <asq-option role="presenter" name="o" progress-value="12" progress-max="15">Oxygen</asq-option>
@@ -92,15 +105,20 @@
       <asq-option role="presenter" name="h" progress-value="7" progress-max="15">Hydrogen</asq-option>
       <asq-option role="presenter" name="n"  class="red"  progress-value="2" progress-max="15">Nitrogen</asq-option>
       <asq-option role="presenter" name="ca" class="blue" progress-value="10" progress-max="15">Calcium</asq-option>
+
+      <asq-option role="presenter" name="other" class="blue" progress-value="10" progress-max="15" is-other other-required>Other</asq-option>
+
     </asq-multi-choice-q>
 
     <h4>A single mode <code>asq-multi-choice-q</code> question for presenter with vertical bar-chart.</h4>
-    <asq-multi-choice-q id="vStats" attr-for-selected="name" role="presenter" stats-layout="vertical">
+    <asq-multi-choice-q id="vStats" attr-for-selected="name" role="presenter" stats-layout="vertical" vstats-num-displayed-elements="4">
       <asq-option role="presenter" name="o" uid="o">Oxygen is absolutely necessary for life</asq-option>
       <asq-option role="presenter" name="c" uid="c">Carbon</asq-option>
       <asq-option role="presenter" name="h" uid="h">Hydrogen</asq-option>
       <asq-option role="presenter" name="n" uid="n">Nitrogen</asq-option>
       <asq-option role="presenter" name="ca" uid="ca">Calcium and something else make salt</asq-option>
+
+      <asq-option role="presenter" name="other" uid="other" class="blue" progress-value="10" progress-max="15" is-other other-required>Other</asq-option>
     </asq-multi-choice-q>
 
     
@@ -134,9 +152,13 @@
         c : 15,
         h : 15,
         n : 15,
-        ca : 70
-      }
-      asqmcP._updateProgress(progress , 100)
+        ca : 70,
+        other: 22
+      };
+
+      var others1 = {
+        "other" : [{text: "this is an option other text", num: 5}, {text:"...and also this one!!", num:17}]};
+      asqmcP._updateProgress(progress , 100, others1)
     })
   </script>
 

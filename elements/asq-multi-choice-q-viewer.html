@@ -43,18 +43,18 @@ In single mode, you can also use arrow keys to select option.
 @homepage http://github.com/ASQ-USI-Elements/asq-multi-choice-q
 -->
 <dom-module id="asq-multi-choice-q-viewer">
-  <style>
-    :host {
-      display: block;
-    }
-
-  </style>
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
     <content select="asq-stem"></content>
     <content id="items" select="*"></content>
   </template>
   <script>
-    Polymer({ 
+    Polymer({
       is: 'asq-multi-choice-q-viewer',
 
       behaviors: [
@@ -64,37 +64,37 @@ In single mode, you can also use arrow keys to select option.
       ],
 
       listeners: {
-        'iron-select' : '_onIronSelect',
-        'iron-deselect' : '_onIronDeselect',
-        'iron-items-changed' : '_onIronItemsChanged'
+        'iron-select': '_onIronSelect',
+        'iron-deselect': '_onIronDeselect',
+        'iron-items-changed': '_onIronItemsChanged'
       },
 
       keyBindings: {
         'left up': 'selectPrevious',
-        'right down': 'selectNext',
+        'right down': 'selectNext'
       },
 
 
-      created: function(){
+      created: function () {
         this.listen(this, 'role-changed', '_onRoleChanged');
       },
 
-      // clear all selections when role has changed 
-      _onRoleChanged: function() {
-        if ( this._initialized ) {
+      // clear all selections when role has changed
+      _onRoleChanged: function () {
+        if (this._initialized) {
           this.clear();
         }
       },
 
 
-      attached: function() {
+      attached: function () {
         this._initialized = true;
         Polymer.dom.flush();
 
         // as domReady
         // We have to do this to wait for the ready of lightdom elements.
         // See details here: https://goo.gl/huOBKi
-        this.async(function() {
+        this.async(function () {
           this._initOptions();
           // tmp: 
           this._updateSelected();
@@ -104,17 +104,17 @@ In single mode, you can also use arrow keys to select option.
         // TODO: temp solution before the pull request gets merged:
         // https://github.com/PolymerElements/iron-selector/pull/64
         this._removeListener(this.activateEvent);
-        this._addListener(this.activateEvent);  
+        this._addListener(this.activateEvent);
 
         this.fire('asq-initialized', {
-          is: this.is, 
+          is: this.is,
           which: this,
           initialized: this._initialized
         });
 
       },
 
-      
+
       properties: {
         /**
          * The selected options.
@@ -129,10 +129,10 @@ In single mode, you can also use arrow keys to select option.
          * Disable or enable the element. Changes will be also
          * propagated to inner propagated elements.
          */
-        disabled: { 
+        disabled: {
           type: Boolean,
           value: false,
-          notify: true, 
+          notify: true,
           observer: '_disabledChanged',
           reflectToAttribute: true
         },
@@ -155,7 +155,7 @@ In single mode, you can also use arrow keys to select option.
          * Overriden from Polymer.IronSelectableBehavior
          *
          *  If you want to use the attribute value of an element for `selected` or `selected-values` instead of the index, set this to the name of the attribute.
-         * 
+         *
          */
         attrForSelected: {
           type: String,
@@ -184,7 +184,7 @@ In single mode, you can also use arrow keys to select option.
 
         /**
          * Overriden from Polymer.IronSelectableBehavior
-         * 
+         *
          * The class to set on elements when selected.
          *
          * @attribute selectedClass
@@ -209,55 +209,55 @@ In single mode, you can also use arrow keys to select option.
         selectedValues: {
           type: Array,
           notify: true,
-          value: function() {
+          value: function () {
             return []
           }
         },
 
         eventBus: {
           type: Object,
-          observer: "_eventBusChanged",
+          observer: '_eventBusChanged',
           notify: true
         },
 
       },
 
-      _valueChanged : function(newVal, oldVal){
-        for ( var i in newVal ) {
-          for ( var j in this.items ) {
+      _valueChanged: function (newVal, oldVal) {
+        for (var i in newVal) {
+          for (var j in this.items) {
             var name = this.items[j].getAttribute(this.attrForSelected);
             var uid = this.items[j].uid;
-            if ( name === '' ) name = i; 
+            if (name === '') name = i;
             // maybe it's a security problem matching on the name?
             // should we only match in the uid?
-            if(( newVal[i].uid.trim()!= "" && newVal[i].uid === uid )
-                ||  newVal[i].name.trim()!= "" && newVal[i].name === name){
-              if(this.items[j].hasAttribute(this.selectedAttribute) != newVal[i].value){
+            if ((newVal[i].uid.trim() != '' && newVal[i].uid === uid)
+              || newVal[i].name.trim() != '' && newVal[i].name === name) {
+              if (this.items[j].hasAttribute(this.selectedAttribute) != newVal[i].value) {
                 this.select(name);
               }
             }
-          } 
+          }
         }
       },
 
-      _onIronSelect: function(){
+      _onIronSelect: function () {
         this.value = this._getValue();
       },
 
-      _onIronDeselect: function(){
+      _onIronDeselect: function (e) {
         this.value = this._getValue();
       },
 
-      _onIronItemsChanged: function(){
+      _onIronItemsChanged: function () {
         this.value = this._getValue();
       },
 
-      _getValue: function(){
+      _getValue: function () {
         var options = [];
 
-        for ( var i in this.items ) {
+        for (var i in this.items) {
           var name = this.items[i].getAttribute(this.attrForSelected);
-          if ( name === '' ) name = i; 
+          if (name === '') name = i;
           options.push({
             uid: this.items[i].uid,
             name: name,
@@ -268,13 +268,13 @@ In single mode, you can also use arrow keys to select option.
         return options;
       },
 
-      _initOptions: function() {
+      _initOptions: function () {
         this._setOptions('multi', this.multi);
       },
 
-      _setOptions: function(attr, value) {
-        for ( var i in this.items ) {
-          if ( typeof this.items[i][attr] !== 'undefined' ) {
+      _setOptions: function (attr, value) {
+        for (var i in this.items) {
+          if (typeof this.items[i][attr] !== 'undefined') {
             this.items[i][attr] = value;
           }
         }
@@ -283,20 +283,20 @@ In single mode, you can also use arrow keys to select option.
       /**
        * Overriden from Polymer.IronMultiSelectableBehavior
        *
-       * Modifications: 1) clear all selections first; 
+       * Modifications: 1) clear all selections first;
        * 2) propagate changes to all options.
        *
-       * 
+       *
        */
-      multiChanged: function(multi) {
-        if ( this._initialized ) {
+      multiChanged: function (multi) {
+        if (this._initialized) {
           this.clear();
         }
         this._selection.multi = multi;
         this._setOptions('multi', this.multi);
       },
 
-      _disabledChanged: function(disabled) {
+      _disabledChanged: function (disabled) {
         this._setOptions('disabled', this.disabled)
       },
 
@@ -306,27 +306,28 @@ In single mode, you can also use arrow keys to select option.
        * sure the give value is to be checked or not. If the `flag` is
        * not specified, it behaves the same as `select` method.
        */
-      toggle: function(value, flag) {
+      toggle: function (value, flag) {
         if (typeof flag === 'undefined') {
           this.select(value);
           return
         }
-        
-        if ( typeof flag === 'boolean' && flag !== this.hasSelected(value) ) {
+
+        if (typeof flag === 'boolean' && flag !== this.hasSelected(value)) {
           this.select(value);
         }
       },
 
       /**
-       * Toggle the given value. 
-       * 
-       * Note, it will always set the item specified by `value` into 
+       * Toggle the given value.
+       *
+       * Note, it will always set the item specified by `value` into
        * opposite state. That is either from `checked` to not checked or
        * from not checked to `checked`.
-       * 
+       *
        */
-      select: function(value) {
-        if ( this.disabled ) return;
+      select: function (value) {
+        if (this.disabled) return;
+        if (this.isOther) return;
         Polymer.IronMultiSelectableBehaviorImpl.select.apply(this, [value]);
         this.fire('asq-multi-choice-q-changed');
       },
@@ -334,7 +335,7 @@ In single mode, you can also use arrow keys to select option.
       /**
        * Clear all selections.
        */
-      clear: function() {
+      clear: function () {
         this.selected = '';
         this.selectedValues = [];
       },
@@ -342,24 +343,23 @@ In single mode, you can also use arrow keys to select option.
       /**
        * Check if the given value has been selected.
        */
-      hasSelected: function(value) {
-        if ( ! this.multi ) 
-          return this.selected === value 
-        else
-          if ( ! this.selectedValues ) this.selectedValues = [];
-          return this.selectedValues.indexOf(value) >=0 
+      hasSelected: function (value) {
+        if (!this.multi)
+          return this.selected === value
+        else if (!this.selectedValues) this.selectedValues = [];
+        return this.selectedValues.indexOf(value) >= 0
       },
 
 
       /**
        * From PolymerElements/paper-radio-group.
        * **Only** useful when `multi` is false.
-       * 
+       *
        * Selects the previous item. If the previous item is disabled, then it is
        * skipped, and its previous item is selected
        */
-      selectPrevious: function() {
-        if ( this.multi ) return;
+      selectPrevious: function () {
+        if (this.multi) return;
         var length = this.items.length;
         var newIndex = Number(this._valueToIndex(this.selected));
 
@@ -373,12 +373,12 @@ In single mode, you can also use arrow keys to select option.
       /**
        * From PolymerElements/paper-radio-group.
        * **Only** useful when `multi` is false.
-       * 
+       *
        * Selects the next item. If the next item is disabled, then it is
        * skipped, and the next item after it is selected.
        */
-      selectNext: function() {
-        if ( this.multi ) return;
+      selectNext: function () {
+        if (this.multi) return;
         var length = this.items.length;
         var newIndex = Number(this._valueToIndex(this.selected));
 
@@ -396,30 +396,46 @@ In single mode, you can also use arrow keys to select option.
       },
 
       /**
-       * Collect answers from inner `asq-option`s and orgnize them 
+       * Collect answers from inner `asq-option`s and orgnize them
        * into an object.
        *
 
-          {
-            uid: this.uid,
-            timestamp: new Date(),
-            options: options
-          }
+       {
+         uid: this.uid,
+         timestamp: new Date(),
+         options: options
+       }
 
        */
-      submit: function() {
-        if ( this.role !== this.roles.VIEWER ) return;
+      submit: function () {
 
-        var options = [];
+        if (this.role !== this.roles.VIEWER) return;
 
-        for ( var i in this.items ) {
-          var name = this.items[i].getAttribute(this.attrForSelected);
-          if ( name === '' ) name = i; 
-          options.push({
-            uid: this.items[i].uid,
-            name: name,
-            value: this.items[i].hasAttribute(this.selectedAttribute)
-          });
+        var options = [],
+          item;
+        for (var i in this.items) {
+          item = this.items[i];
+
+          if ((name = item.getAttribute(this.attrForSelected)) === '')
+            name = i;
+
+          var val = item.hasAttribute(this.selectedAttribute);
+
+          if (this) {
+
+            var newOption = {
+              uid: item.uid,
+              name: name,
+              value: val
+            };
+
+            if (item.isOther) {
+
+              var otherText = val ? item.value : '';
+              newOption.otherText = otherText;
+            }
+            options.push(newOption);
+          }
         }
 
         return {
@@ -430,51 +446,82 @@ In single mode, you can also use arrow keys to select option.
       },
 
       _eventBusChanged: function (eventBus) {
-        if(!eventBus) return;
+        if (!eventBus) return;
         eventBus.on('asq:question_type', this._onQuestionType.bind(this));
       },
 
-      _onQuestionType: function(evt){
-        if (!evt || ! evt.questionType) return;
-        if ( this.items.length === 0 ) return;
-        if ( evt.questionType == 'asq-multi-choice-q' ) {
-          if(evt.type == 'restoreViewer'){
+      _onQuestionType: function (evt) {
+        if (!evt || !evt.questionType) return;
+        if (this.items.length === 0) return;
+        if (evt.questionType == 'asq-multi-choice-q') {
+          if (evt.type == 'restoreViewer') {
             this._onRestoreViewer(evt);
           }
         }
       },
 
       // zhenfei: may use ECMA 6 Array.prototype.find instead ?
-      _findOptionById: function(uid) {
-        for ( var i in this.items ) {
-          if ( this.items[i].uid == uid ) {
+      _findOptionById: function (uid) {
+        for (var i in this.items) {
+          if (this.items[i].uid == uid) {
             return this.items[i]
           }
         }
       },
 
-      
-      _onRestoreViewer: function(evt){
-        if ( !evt.questions ) return;
-        
-        evt.questions.forEach(function(q){
-        if( q.uid != this.uid ) return;
-          q.options.forEach(function(option){
-           this._updateOption(option.uid, option.value);
+
+      _onRestoreViewer: function (evt) {
+        if (!evt.questions) return;
+
+        evt.questions.forEach(function (q) {
+          if (q.uid != this.uid) return;
+          q.options.forEach(function (option) {
+            this._updateOption(option.uid, option.value);
           }.bind(this));
         }.bind(this));
       },
 
       // value is boolean, meaning checked or not.
-      _updateOption: function(uid, value){
+      _updateOption: function (uid, value) {
         var option = this._findOptionById(uid);
-        if(! option){
+        if (!option) {
           console.error('Failed to updateOption; could not find option with uid %s', uid);
           return;
         }
         this.toggle(option.getAttribute(this.attrForSelected), value);
+      },
+
+      /**
+       * Override from Polymer.IronSelectableBehavior
+       *
+       * prevent the closing of 'paper-input' if clicked
+       */
+
+      _activateHandler: function (e) {
+        if (this._containsElement(e.path, 'PAPER-INPUT'))
+          return;
+        var t = e.target;
+
+        var items = this.items;
+        while (t && t != this) {
+          var i = items.indexOf(t);
+          if (i >= 0) {
+            var value = this._indexToValue(i);
+            this._itemActivate(value, t);
+            return;
+          }
+          t = t.parentNode;
+        }
+      },
+
+      _containsElement: function (elements, el) {
+        for (var i in elements) {
+          if (elements[i].nodeName === el)
+            return true;
+        }
+        return false;
       }
-      
+
     });
   </script>
 </dom-module>
