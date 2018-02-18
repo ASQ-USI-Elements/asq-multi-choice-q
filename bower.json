@@ -15,7 +15,7 @@
   "dependencies": {
     "polymer": "Polymer/Polymer#^1.2.1",
     "asq-base": "ASQ-USI-Elements/asq-base#master",
-    "asq-option": "ASQ-USI-Elements/asq-option#feat-merg-with-asq-option-other",
+    "asq-option": "ASQ-USI-Elements/asq-option#master",
     "asq-stem": "ASQ-USI-Elements/asq-stem#master",
     "iron-selector": "PolymerElements/iron-selector#^1.0.8",
     "paper-radio-group": "PolymerElements/paper-radio-group#^1.0.6",
